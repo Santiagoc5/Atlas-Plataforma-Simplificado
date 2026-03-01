@@ -1,0 +1,10 @@
+from django.urls import path, include
+from .views import ProductoViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'productos', ProductoViewSet, basename='producto')
+
+urlpatterns = [
+    path('api/', include(router.urls)),
+]

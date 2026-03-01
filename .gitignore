@@ -1,0 +1,26 @@
+# Node (Frontend)
+node_modules/
+dist/
+build/
+.env
+.eslintcache
+
+# Python (Backend)
+__pycache__/
+*.pyc
+venv/
+.venv/
+db.sqlite3
+media/
+
+# Otros
+.DS_Store
+.vscode/
+
+# Base de Datos y Secretos
+.env
+__pycache__/
+*.pyc
+
+# Si alguna vez haces un backup (dump) de Postgres en la carpeta
+*.sql

@@ -1,0 +1,25 @@
+/* Esto obliga a que el cálculo de ancho incluya el padding y el border */
+* {
+  box-sizing: border-box !important;
+}
+
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  position: relative;
+  font-family: sans-serif;
+}
+
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Notificaciones por encima del botón de WhatsApp */
+.Toastify__toast-container {
+  z-index: 99999 !important;
+}
