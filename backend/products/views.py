@@ -233,3 +233,14 @@ def admin_editar_vehiculo(request, pk):
         return Response({'id_vehiculo': vehiculo.id_vehiculo, 'nombre_completo': vehiculo.nombre_completo})
     except Vehiculo.DoesNotExist:
         return Response({'error': 'Vehículo no encontrado'}, status=404)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_eliminar_imagen(request, pk):
+    if not request.user.is_superuser:
+        return Response({'error': 'No autorizado'}, status=403)
+    try:
+        ImagenProducto.objects.get(pk=pk).delete()
+        return Response(status=204)
+    except ImagenProducto.DoesNotExist:
+        return Response({'error': 'Imagen no encontrada'}, status=404)

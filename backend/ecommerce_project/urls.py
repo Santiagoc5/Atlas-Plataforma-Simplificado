@@ -8,7 +8,7 @@ from products.views import (
     admin_actualizar_producto, admin_eliminar_producto,
     admin_listar_categorias, admin_crear_categoria, admin_eliminar_categoria,
     admin_listar_vehiculos, admin_crear_vehiculo, admin_asociar_vehiculos,
-    admin_eliminar_vehiculo, admin_editar_vehiculo,
+    admin_eliminar_vehiculo, admin_editar_vehiculo, admin_eliminar_imagen,
     # Rutas públicas
     ProductoViewSet, listar_ofertas, busqueda_predictiva,
 )
@@ -34,6 +34,7 @@ urlpatterns = [
     path("api/admin/productos/<int:pk>/editar/", admin_actualizar_producto),
     path("api/admin/productos/<int:pk>/eliminar/", admin_eliminar_producto),
     path("api/admin/productos/<int:pk>/vehiculos/", admin_asociar_vehiculos),
+    path('api/admin/imagenes/<int:pk>/eliminar/', admin_eliminar_imagen),
 
     # ── Admin: Categorías ──────────────────────────────────────────────────
     path("api/admin/categorias/", admin_listar_categorias),

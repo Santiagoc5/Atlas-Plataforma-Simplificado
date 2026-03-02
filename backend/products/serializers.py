@@ -17,7 +17,7 @@ class VehiculoSerializer(serializers.ModelSerializer):
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
-        fields = ['id_categoria', 'nombre', 'descripcion']
+        fields = ['id_categoria', 'nombre']
 
 
 class ProductoSerializer(serializers.ModelSerializer):
