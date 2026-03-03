@@ -15,7 +15,7 @@ class Categoria(models.Model):
         
 class Producto(models.Model):
     id_producto = models.AutoField(primary_key=True)
-    id_categoria = models.ForeignKey('Categoria', models.DO_NOTHING, db_column='id_categoria', null=True, blank=True)
+    id_categoria = models.ForeignKey('Categoria', models.SET_NULL, db_column='id_categoria', null=True, blank=True)
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)

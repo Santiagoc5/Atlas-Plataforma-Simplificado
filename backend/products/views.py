@@ -110,11 +110,12 @@ def admin_eliminar_producto(request, pk):
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     try:
-        Producto.objects.get(pk=pk).delete()
+        producto = Producto.objects.get(pk=pk)
+        ProductoVehiculo.objects.filter(id_producto=producto).delete()
+        producto.delete()
         return Response(status=204)
     except Producto.DoesNotExist:
         return Response({'error': 'Producto no encontrado'}, status=404)
-
 
 # ─── ADMIN: CATEGORÍAS ────────────────────────────────────────────────────────
 
