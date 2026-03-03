@@ -38,7 +38,8 @@ const Checkout = () => {
 
     let lugarEntrega;
     if (tipoEnvio === 'domicilio') {
-      lugarEntrega = formData.direccion;
+      const partes = [formData.direccion, formData.municipio, formData.ciudad].filter(Boolean);
+      lugarEntrega = partes.join(', ');
     } else {
       const partes = [formData.municipio, formData.ciudad].filter(Boolean);
       lugarEntrega = partes.length > 0
@@ -47,14 +48,13 @@ const Checkout = () => {
     }
 
     const mensaje =
-      `Nuevo pedido - Atlas\n\n` +
-      `Nombre: ${formData.nombre}\n` +
-      `Tel: ${formData.telefono}\n` +
-      `CC: ${formData.cedula}\n` +
-      ` ${lugarEntrega}\n\n` +
-      `${listaProductos}\n\n` +
-      `Total: $${total.toLocaleString('es-CO')}`;
-
+  `🛒✨ *Nuevo Pedido - Atlas* ✨🛒\n\n` +
+  `👤 *Nombre:* ${formData.nombre}\n` +
+  `📱 Teléfono: ${formData.telefono}\n` +
+  `🪪 Cédula: ${formData.cedula}\n` +
+  `📍 Entrega: ${lugarEntrega}\n\n` +
+  `🧾 Productos:\n${listaProductos}\n\n` +
+  `💵 Total: $${total.toLocaleString('es-CO')}`;
     window.open(`https://wa.me/${numeroDuenio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   };
 

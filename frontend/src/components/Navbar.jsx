@@ -3,6 +3,7 @@ import { Search, ShoppingCart, ChevronDown, ChevronUp, Menu, X } from 'lucide-re
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
+import { API_BASE } from '../config';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,21 +22,15 @@ const Navbar = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  const host = window.location.hostname;
-  const apiBase = host === 'localhost' || host === '127.0.0.1'
-    ? 'http://127.0.0.1:8000'
-    : `http://${host}:8000`;
-
-  // Búsqueda predictiva
   useEffect(() => {
     const buscar = async () => {
       if (searchTerm.length > 1) {
         try {
-          const res = await fetch(`${apiBase}/api/predictivo/?q=${searchTerm}`);
+          const res = await fetch(`${API_BASE}/api/predictivo/?q=${searchTerm}`);
           const data = await res.json();
           setSugerencias(data);
           setShowDropdown(true);
-        } catch (e) { console.error(e); }
+        } catch (e) { }
       } else {
         setSugerencias([]);
         setShowDropdown(false);
@@ -43,7 +38,7 @@ const Navbar = () => {
     };
     const t = setTimeout(buscar, 300);
     return () => clearTimeout(t);
-  }, [searchTerm, apiBase]);
+  }, [searchTerm]);
 
   // Cerrar search dropdown al click fuera
   useEffect(() => {
@@ -244,7 +239,7 @@ useEffect(() => {
                     onMouseOver={e => e.currentTarget.style.background = 'rgba(230,0,0,0.07)'}
                     onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                   >
-                    <img src={`${apiBase}${prod.imagen}`} alt={prod.nombre} style={{ width: '38px', height: '38px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.07)' }} />
+                    <img src={`${API_BASE}${prod.imagen}`} alt={prod.nombre} style={{ width: '38px', height: '38px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.07)' }} />
                     <span style={{ flex: 1, fontSize: '13px', fontWeight: '500', color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prod.nombre}</span>
                     <Search size={13} style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0 }} />
                   </div>
@@ -349,7 +344,7 @@ useEffect(() => {
                   onMouseOver={e => e.currentTarget.style.background = 'rgba(230,0,0,0.07)'}
                   onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <img src={`${apiBase}${prod.imagen}`} alt={prod.nombre} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }} />
+                  <img src={`${API_BASE}${prod.imagen}`} alt={prod.nombre} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }} />
                   <span>{prod.nombre}</span>
                 </div>
               ))}

@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Package, ChevronDown, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import ModalProducto from './ModalProducto';
+import ModalProducto from '../components/ModalProducto';
+import { API_BASE } from '../config';
 
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [cargando, setCargando] = useState(true);
-  const { hash } = useLocation();
-  const { addToCart } = useCart();
   const location = useLocation();
+  const { hash } = location;
+  const { addToCart } = useCart();
 
   const [filtros, setFiltros] = useState({ precioMax: 3000000, modelo: '', calidad: '' });
   const [modeloOpen, setModeloOpen] = useState(false);
@@ -30,15 +31,10 @@ const Catalogo = () => {
 
   // Carga de datos
   useEffect(() => {
-    const host = window.location.hostname;
-    const apiBase = host === 'localhost' || host === '127.0.0.1'
-      ? 'http://127.0.0.1:8000'
-      : `http://${host}:8000`;
-
     const queryParams = new URLSearchParams(location.search);
     const searchTerm = queryParams.get('search')?.toLowerCase();
 
-    fetch(`${apiBase}/api/productos/`)
+    fetch(`${API_BASE}/api/productos/`)
       .then(res => res.json())
       .then(data => {
         setProductos(data);
@@ -51,7 +47,7 @@ const Catalogo = () => {
         }
         setCargando(false);
       })
-      .catch(err => { console.error('Error:', err); setCargando(false); });
+      .catch(() => setCargando(false));
   }, [location.search]);
 
   // Scroll automático por hash
@@ -75,7 +71,6 @@ const Catalogo = () => {
     return Object.values(secciones).sort((a, b) => a.titulo.localeCompare(b.titulo));
   };
 
-  // Modelos únicos desde la BD
   // Vehículos únicos desde producto.vehiculos (relación en BD)
   const vehiculosUnicos = (() => {
     const mapa = new Map();

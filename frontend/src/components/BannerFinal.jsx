@@ -1,5 +1,4 @@
 import React from 'react';
-// Usaremos el icono de la Corona que elegimos para el toque Premium
 import { Crown, MessageCircle } from 'lucide-react';
 
 const BannerFinal = () => {
@@ -12,7 +11,6 @@ const BannerFinal = () => {
       overflow: 'hidden',
       marginBottom: '0px',
     }}>
-      {/* Círculo decorativo de fondo para dar profundidad */}
       <div style={{
         position: 'absolute',
         top: '-50%',
@@ -49,9 +47,9 @@ const BannerFinal = () => {
         </p>
 
         <a href='https://wa.me/573005307606?text=Hola%20Atlas,%20estoy%20interesado%20en%20accesorios%20para%20mi%20camioneta' 
-  target="_blank"
-         rel='noopener noreferrer'         
-         style={{
+        target="_blank"
+        rel='noopener noreferrer'         
+        style={{
           backgroundColor: '#e60000',
           color: 'white',
           padding: '18px 40px',

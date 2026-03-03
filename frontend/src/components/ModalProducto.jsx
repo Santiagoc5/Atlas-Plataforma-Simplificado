@@ -38,8 +38,6 @@ const ModalProducto = ({ producto, onClose }) => {
 
   if (!producto) return null;
 
-  console.log(producto);
-
   const enOferta = producto.precio_oferta && Number(producto.precio_oferta) < Number(producto.precio);
   const precioFinal = enOferta ? Number(producto.precio_oferta) : Number(producto.precio);
 

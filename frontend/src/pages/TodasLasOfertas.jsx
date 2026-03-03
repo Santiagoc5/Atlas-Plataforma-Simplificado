@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Zap, ArrowLeft, Loader2, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
-import ModalProducto from './ModalProducto';
+import { API_BASE } from '../config';
+import ModalProducto from '../components/ModalProducto';
 
 const TodasLasOfertas = () => {
   const [productos, setProductos] = useState([]);
@@ -12,27 +13,20 @@ const TodasLasOfertas = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const host = window.location.hostname;
-  const apiBase =
-    host === 'localhost' || host === '127.0.0.1'
-      ? 'http://127.0.0.1:8000'
-      : `http://${host}:8000`;
-
   useEffect(() => {
     window.scrollTo(0, 0);
     const obtenerOfertas = async () => {
       try {
-        const response = await fetch(`${apiBase}/api/productos/ofertas/`);
+        const response = await fetch(`${API_BASE}/api/productos/ofertas/`);
         const data = await response.json();
         setProductos(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error:', error);
+      } catch {
       } finally {
         setCargando(false);
       }
     };
     obtenerOfertas();
-  }, [apiBase]);
+  }, []);
 
   const handleAddToCart = (producto) => {
     addToCart(producto);

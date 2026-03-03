@@ -31,7 +31,7 @@ const AppContent = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/todas-las-ofertas" element={<TodasLasOfertas />} />
           <Route path="/catalogo" element={<Catálogo />} />
-          <Route path="/Contacto" element={<Contacto />} />
+          <Route path="/contacto" element={<Contacto />} />
         </Routes>
         {!isAdmin && <Footer />}
       </div>

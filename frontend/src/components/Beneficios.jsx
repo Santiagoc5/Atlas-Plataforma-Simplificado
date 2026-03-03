@@ -16,7 +16,7 @@ const Beneficios = () => {
     {
       icono: <CreditCard size={35} color="white" />,
       titulo: "Pago Flexible",
-      after: "Múltiples métodos de pago: Transferencia y pago contra entrega"
+      texto: "Múltiples métodos de pago: Transferencia y pago contra entrega"
     }
   ];
 
@@ -62,7 +62,7 @@ const Beneficios = () => {
               {item.titulo}
             </h3>
             <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.6' }}>
-              {item.texto || item.after}
+              {item.texto}
             </p>
           </div>
         ))}

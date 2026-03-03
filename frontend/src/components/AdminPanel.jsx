@@ -941,7 +941,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
   const [vehiculos, setVehiculos] = useState(product?.vehiculos || []);
   const [mainImg, setMainImg] = useState(null);
   const [extraImgs, setExtraImgs] = useState([]);
-  // Imágenes ya guardadas en el servidor (al editar)
   const [existingImgs, setExistingImgs] = useState(product?.imagenes_adicionales || []);
   const [deletingImgId, setDeletingImgId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -998,7 +997,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
       onSaved();
     } catch (e) {
       toast.error("Error al guardar el producto");
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -1021,7 +1019,7 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
           <button className="btn btn-ghost btn-icon btn-sm" onClick={onClose}><Icon d={Icons.x} size={18} /></button>
         </div>
         <div className="modal-body">
-          {/* Basic info */}
+
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div className="section-label">Información básica</div>
             <div className="form-grid">
@@ -1035,7 +1033,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
             </div>
           </div>
 
-          {/* Details */}
           <div>
             <div className="section-label">Detalles</div>
             <div className="form-grid">
@@ -1067,7 +1064,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
             </div>
           </div>
 
-          {/* Offer toggle */}
           <div style={{
             display: "flex", alignItems: "center", gap: 14,
             background: form.en_oferta ? "rgba(230,0,0,0.04)" : "var(--bg3)",
@@ -1084,7 +1080,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
             </div>
           </div>
 
-          {/* Images */}
           <div>
             <div className="section-label">Imágenes</div>
             <div className="form-grid">
@@ -1168,7 +1163,6 @@ function ProductForm({ token, product, categorias, onClose, onSaved }) {
             </div>
           </div>
 
-          {/* Vehicles */}
           <div>
             <div className="section-label">Vehículos compatibles</div>
             <VehicleSelector token={token} selected={vehiculos} onChange={setVehiculos} />
@@ -1670,7 +1664,6 @@ export default function AdminPanel() {
       <div className="layout">
         <div className="noise-layer" />
 
-        {/* Overlay mobile — visible cuando sidebar está abierto en móvil */}
         {sidebarOpen && isMobile && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 99 }}
             onClick={() => setSidebarOpen(false)} />

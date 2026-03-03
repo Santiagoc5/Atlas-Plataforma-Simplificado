@@ -1,48 +1,42 @@
-import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 const CartContext = createContext();
+const MAX_QUANTITY = 3;
 
 export const CartProvider = ({ children }) => {
-    // El carrito vive SIEMPRE en el localStorage del navegador
     const [cart, setCart] = useState(() => {
         const localData = localStorage.getItem('cart_atlas');
         return localData ? JSON.parse(localData) : [];
     });
 
-    const isInitial = useRef(true);
-    const lastNotification = useRef(null);
-
-    // Guardar en LocalStorage cada vez que cambie el estado del carrito
     useEffect(() => {
         localStorage.setItem('cart_atlas', JSON.stringify(cart));
-
-        // Mostrar notificaciones de productos añadidos/quitados
-        if (!isInitial.current && lastNotification.current) {
-            const { type, message } = lastNotification.current;
-            if (type === 'success') toast.success(message);
-            else if (type === 'info') toast.info(message);
-            lastNotification.current = null;
-        }
-
-        isInitial.current = false;
     }, [cart]);
 
-    // --- MÉTODOS ---
+    const getPrecio = (product) =>
+        product.en_oferta && product.precio_oferta
+            ? product.precio_oferta
+            : product.precio;
+
     const addToCart = (product) => {
-        setCart((prevCart) => {
-            const existingProduct = prevCart.find(item => item.id_producto === product.id_producto);
-            if (existingProduct) {
-                lastNotification.current = { type: 'info', message: `${product.nombre} +1` };
-                return prevCart.map(item =>
-                    item.id_producto === product.id_producto
-                        ? { ...item, cantidad: item.cantidad + 1 }
-                        : item
-                );
+        const existingProduct = cart.find(item => item.id_producto === product.id_producto);
+
+        if (existingProduct) {
+            if (existingProduct.cantidad >= MAX_QUANTITY) {
+                toast.warning(`Máximo ${MAX_QUANTITY} unidades por producto`);
+                return;
             }
-            lastNotification.current = { type: 'success', message: `${product.nombre} añadido` };
-            return [...prevCart, { ...product, cantidad: 1 }];
-        });
+            toast.info(`${product.nombre} +1`);
+            setCart(prevCart => prevCart.map(item =>
+                item.id_producto === product.id_producto
+                    ? { ...item, cantidad: item.cantidad + 1 }
+                    : item
+            ));
+        } else {
+            toast.success(`${product.nombre} añadido`);
+            setCart(prevCart => [...prevCart, { ...product, precio: getPrecio(product), cantidad: 1 }]);
+        }
     };
 
     const decreaseQuantity = (productId) => {
@@ -62,7 +56,6 @@ export const CartProvider = ({ children }) => {
 
     const clearCart = () => setCart([]);
 
-    // Cálculos
     const totalPrecio = cart.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
     const totalItems = cart.reduce((acc, item) => acc + item.cantidad, 0);
 

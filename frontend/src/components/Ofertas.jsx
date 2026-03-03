@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Zap, ArrowRight, Loader2, ShoppingCart, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../config';
 import ModalProducto from './ModalProducto';
 
 const Ofertas = () => {
@@ -12,26 +13,19 @@ const Ofertas = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const host = window.location.hostname;
-  const apiBase =
-    host === 'localhost' || host === '127.0.0.1'
-      ? 'http://127.0.0.1:8000'
-      : `http://${host}:8000`;
-
   useEffect(() => {
     const obtenerOfertas = async () => {
       try {
-        const response = await fetch(`${apiBase}/api/productos/ofertas/`);
+        const response = await fetch(`${API_BASE}/api/productos/ofertas/`);
         const data = await response.json();
         setProductos(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error al obtener ofertas:', error);
+      } catch {
       } finally {
         setCargando(false);
       }
     };
     obtenerOfertas();
-  }, [apiBase]);
+  }, []);
 
   const handleAddToCart = (producto) => {
     addToCart(producto);

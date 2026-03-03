@@ -1,11 +1,10 @@
-from django.shortcuts import render
-from rest_framework import generics, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Producto, Categoria, ImagenProducto
+from .models import Producto, Categoria, ImagenProducto, Vehiculo, ProductoVehiculo
 from .serializers import ProductoSerializer, CategoriaSerializer
 from users.models import Usuario
 
@@ -153,7 +152,6 @@ def admin_eliminar_categoria(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_listar_vehiculos(request):
-    from .models import Vehiculo
     query = request.query_params.get('q', '')
     if query:
         vehiculos = Vehiculo.objects.filter(nombre_completo__icontains=query)[:10]
@@ -167,7 +165,6 @@ def admin_listar_vehiculos(request):
 def admin_crear_vehiculo(request):
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
-    from .models import Vehiculo
     nombre = request.data.get('nombre_completo', '').strip()
     if not nombre:
         return Response({'error': 'El nombre es requerido'}, status=400)
@@ -183,7 +180,6 @@ def admin_asociar_vehiculos(request, pk):
     """Reemplaza todos los vehículos asociados a un producto."""
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
-    from .models import Vehiculo, ProductoVehiculo
     try:
         producto = Producto.objects.get(pk=pk)
     except Producto.DoesNotExist:
@@ -204,7 +200,6 @@ def admin_asociar_vehiculos(request, pk):
 def admin_eliminar_vehiculo(request, pk):
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
-    from .models import Vehiculo, ProductoVehiculo
     try:
         vehiculo = Vehiculo.objects.get(pk=pk)
         # Primero elimina todas las asociaciones con productos
@@ -220,7 +215,6 @@ def admin_eliminar_vehiculo(request, pk):
 def admin_editar_vehiculo(request, pk):
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
-    from .models import Vehiculo
     try:
         vehiculo = Vehiculo.objects.get(pk=pk)
         nombre = request.data.get('nombre_completo', '').strip()

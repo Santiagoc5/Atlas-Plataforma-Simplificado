@@ -1,6 +1,6 @@
 import React from 'react';
 import Hero from '../components/Hero';
-import Ofertas from './Ofertas';
+import Ofertas from '../components/Ofertas';
 import Beneficios from '../components/Beneficios';
 import BannerFinal from '../components/BannerFinal';
 

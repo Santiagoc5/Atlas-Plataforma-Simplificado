@@ -10,7 +10,7 @@ class ImagenProductoInline(admin.TabularInline):
 class ProductoVehiculoInline(admin.TabularInline):
     model = ProductoVehiculo
     extra = 1
-    autocomplete_fields = ['id_vehiculo'] # Esto seguirá funcionando con el nuevo campo
+    autocomplete_fields = ['id_vehiculo']
 
 # 3. Administrador de Vehículos (Simplificado)
 @admin.register(Vehiculo)
