@@ -22,11 +22,31 @@ export const CartProvider = ({ children }) => {
     const addToCart = (product) => {
         const existingProduct = cart.find(item => item.id_producto === product.id_producto);
 
+        // Tomamos el stock disponible desde el producto que viene del backend
+        // o, si ya está en el carrito, desde el propio item del carrito.
+        const availableStock = (existingProduct && existingProduct.stock != null)
+            ? existingProduct.stock
+            : (product.stock != null ? product.stock : Infinity);
+
+        // Si no hay stock, no permitimos agregar al carrito
+        if (availableStock <= 0) {
+            toast.warning(`No hay stock disponible de ${product.nombre}`);
+            return;
+        }
+
         if (existingProduct) {
+            // Primero validamos que no se sobrepase el stock disponible
+            if (existingProduct.cantidad >= availableStock) {
+                toast.warning(`No puedes agregar más cantidad de ${product.nombre}, stock máximo: ${availableStock}`);
+                return;
+            }
+
+            // Luego respetamos también el límite máximo por producto
             if (existingProduct.cantidad >= MAX_QUANTITY) {
                 toast.warning(`Máximo ${MAX_QUANTITY} unidades por producto`);
                 return;
             }
+
             toast.info(`${product.nombre} +1`);
             setCart(prevCart => prevCart.map(item =>
                 item.id_producto === product.id_producto

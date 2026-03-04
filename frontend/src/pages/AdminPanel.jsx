@@ -3,13 +3,49 @@ import { useState, useEffect, useCallback } from "react";
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const getApiBase = () => `http://${window.location.hostname}:8000`;
 
-const api = async (path, options = {}, token = null) => {
-  const headers = { ...(options.headers || {}) };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  const isFormData = options.body instanceof FormData;
-  if (!isFormData) headers["Content-Type"] = "application/json";
+let _forceLogout = null; // referencia global para forzar logout desde api()
 
-  const res = await fetch(`${getApiBase()}${path}`, { ...options, headers });
+const refreshAccessToken = async () => {
+  const refresh = localStorage.getItem("refresh_token");
+  if (!refresh) throw new Error("No refresh token");
+
+  const res = await fetch(`${getApiBase()}/api/token/refresh/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh }),
+  });
+
+  if (!res.ok) throw new Error("Refresh failed");
+
+  const data = await res.json();
+  localStorage.setItem("token", data.access);
+  return data.access;
+};
+
+const api = async (path, options = {}, token = null) => {
+  const doRequest = async (tkn) => {
+    const headers = { ...(options.headers || {}) };
+    if (tkn) headers["Authorization"] = `Bearer ${tkn}`;
+    const isFormData = options.body instanceof FormData;
+    if (!isFormData) headers["Content-Type"] = "application/json";
+    return fetch(`${getApiBase()}${path}`, { ...options, headers });
+  };
+
+  let res = await doRequest(token);
+
+  // Token vencido → intentar renovar
+  if (res.status === 401) {
+    try {
+      const newToken = await refreshAccessToken();
+      res = await doRequest(newToken); // reintentar con nuevo token
+    } catch {
+      // Refresh también vencido → forzar logout
+      toast.error("Sesión expirada. Inicia sesión nuevamente.");
+      _forceLogout?.();
+      throw new Error("Session expired");
+    }
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw err;
@@ -191,7 +227,7 @@ const styles = `
     display: flex; align-items: center; padding: 0 24px; gap: 14px;
   }
   .topbar-title { font-size: 15px; font-weight: 700; flex: 1; letter-spacing: -.01em; }
-  .menu-btn { display: none; }
+  .menu-btn { display: none !important; }
   .content { flex: 1; overflow-y: auto; padding: 26px; background: var(--bg); }
 
   /* ── Stats ── */
@@ -598,7 +634,7 @@ const styles = `
     :root { --sidebar-w: 100vw; --header-h: 56px; }
     .sidebar { position: fixed; height: 100vh; width: var(--sidebar-w); max-width: 300px; }
     .sidebar:not(.collapsed) { box-shadow: 0 0 60px rgba(0,0,0,.8); }
-    .menu-btn { display: flex; }
+    .menu-btn { display: flex !important; }
     .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
     .col-span-2, .col-span-3 { grid-column: span 1; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -699,17 +735,17 @@ function ConfirmDialog({ message, onConfirm, onCancel }) {
 
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 function LoginPage({ onLogin }) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email || !pass) return toast.error("Completa todos los campos");
+    if (!username || !pass) return toast.error("Completa todos los campos");
     setLoading(true);
     try {
       const data = await api("/api/login/", {
         method: "POST",
-        body: JSON.stringify({ email, password: pass }),
+        body: JSON.stringify({ username, password: pass }),
       });
       onLogin(data);
       toast.success(`Bienvenido, ${data.user.nombre}`);
@@ -740,9 +776,9 @@ function LoginPage({ onLogin }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div className="form-group">
-            <label className="form-label">Correo electrónico</label>
-            <input className="input" type="email" placeholder="admin@empresa.com" value={email}
-              onChange={(e) => setEmail(e.target.value)}
+            <label className="form-label">Nombre de usuario</label>
+            <input className="input" type="text" placeholder="admin" value={username}
+              onChange={(e) => setUsername(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()} />
           </div>
           <div className="form-group">
@@ -1614,6 +1650,12 @@ export default function AdminPanel() {
       return u && t ? { user: JSON.parse(u), token: t } : null;
     } catch { return null; }
   });
+  const logout = () => {
+    localStorage.clear();
+    setSession(null);
+    toast.info("Sesión cerrada");
+  };
+  _forceLogout = logout;
   const [page, setPage] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
@@ -1634,12 +1676,6 @@ export default function AdminPanel() {
     localStorage.setItem("token", data.token);
     localStorage.setItem("refresh_token", data.refresh);
     setSession({ user: data.user, token: data.token });
-  };
-
-  const logout = () => {
-    localStorage.clear();
-    setSession(null);
-    toast.info("Sesión cerrada");
   };
 
   const groups = NAV.reduce((acc, item) => {

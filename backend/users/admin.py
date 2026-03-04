@@ -4,13 +4,21 @@ from .models import Usuario
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
-    list_display = ('email', 'nombre', 'is_staff')                
+    list_display = ('username', 'nombre', 'is_staff')
     
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('username', 'password')}),
         ('Información Personal', {'fields': ('nombre',)}),
         ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
     )
+
+    # Formulario de alta en el admin (para no depender de 'email')
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'nombre', 'password1', 'password2'),
+        }),
+    )
     
-    ordering = ('email',)
-    search_fields = ('email', 'nombre')
+    ordering = ('username',)
+    search_fields = ('username', 'nombre')

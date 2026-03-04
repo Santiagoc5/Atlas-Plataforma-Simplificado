@@ -11,7 +11,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 import TodasLasOfertas from './pages/TodasLasOfertas';
 import Checkout from './pages/Checkout';
 import { CartProvider } from './context/CartContext';
-import AdminPanel from './components/AdminPanel';
+import AdminPanel from './pages/AdminPanel';
 import './App.css';
 
 const AppContent = () => {
