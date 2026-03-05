@@ -3,9 +3,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
-        """
-        Crea un usuario usando nombre de usuario como identificador principal.
-        """
         if not username:
             raise ValueError('El nombre de usuario es obligatorio')
         user = self.model(username=username, **extra_fields)

@@ -36,7 +36,7 @@ export default function Hero() {
       </h1>
 
       <p style={{ fontSize: '1.2rem', color: '#ccc', marginTop: '15px', maxWidth: '500px' }}>
-        Especialistas en lujos y accesorios para Hilux, D-Max, BT50 y más.
+        Especialistas en lujos y accesorios para 4x4
       </p>
 
       {/* Sección de Beneficios (Checks) */}
@@ -50,7 +50,7 @@ export default function Hero() {
     <span style={{ color: '#2ecc71' }}>✔</span> Garantía 6 meses
   </div>
   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
-    <span style={{ color: '#2ecc71' }}>✔</span> Envío a casi todo el país
+    <span style={{ color: '#2ecc71' }}>✔</span> Cobertura en gran parte del país
   </div>
   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
     <span style={{ color: '#2ecc71' }}>✔</span> Pago contra entrega

@@ -11,12 +11,12 @@ const Beneficios = () => {
     {
       icono: <Truck size={35} color="white" />,
       titulo: "Envío Nacional",
-      texto: "Entregas a casi todo el país. Llega en 2-4 días hábiles"
+      texto: "Cobertura en gran parte del país. Recíbelo en 2 a 3 días hábiles en ciudades principales."
     },
     {
       icono: <CreditCard size={35} color="white" />,
-      titulo: "Pago Flexible",
-      texto: "Múltiples métodos de pago: Transferencia y pago contra entrega"
+      titulo: "Opciones de pago",
+      texto: "Aceptamos transferencia bancaria y pago contra entrega."
     }
   ];
 

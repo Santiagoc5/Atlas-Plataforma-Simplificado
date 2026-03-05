@@ -20,8 +20,11 @@ const AppContent = () => {
 
   return (
     <CartProvider>
-      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false}
-        newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="colored" />
+      <ToastContainer
+      position="top-left"
+      autoClose={2500}
+      style={{ padding: 0 }}
+      />
       <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white' }}>
         {!isAdmin && <Navbar />}
         {!isAdmin && <WhatsAppButton />}

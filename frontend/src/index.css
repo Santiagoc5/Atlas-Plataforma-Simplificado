@@ -10,7 +10,7 @@ html, body {
   padding: 0 !important;
   overflow-x: hidden !important;
   position: relative;
-  font-family: sans-serif;
+  font-family: 'DM Sans', sans-serif;
 }
 
 #root {

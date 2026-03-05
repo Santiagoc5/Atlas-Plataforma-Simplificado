@@ -122,7 +122,7 @@ const Footer = () => {
 
       {/* Copyright */}
       <div style={{ borderTop: '1px solid #333', paddingTop: '20px', textAlign: 'center', fontSize: '12px', color: '#777' }}>
-        © 2026 Atlas Accesorios. Desarrollado por Santiago. Todos los derechos reservados.
+        © 2026 Atlas Accesorios. Todos los derechos reservados.
       </div>
     </footer>
   );
