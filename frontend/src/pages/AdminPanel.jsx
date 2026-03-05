@@ -34,7 +34,7 @@ const api = async (path, options = {}, token = null) => {
   let res = await doRequest(token);
 
   // Token vencido → intentar renovar
-  if (res.status === 401) {
+  if (res.status === 401 && token) {
     try {
       const newToken = await refreshAccessToken();
       res = await doRequest(newToken); // reintentar con nuevo token

@@ -119,9 +119,11 @@ const ModalProducto = ({ producto, onClose }) => {
                   </div>
                 </div>
                 <div className="mp-stock-info">
+                  {producto.stock > 0 && (
                   <span style={{ color: producto.stock < 5 ? '#e60000' : '#16a34a' }}>
                     ✓ {producto.stock < 5 ? `¡Solo ${producto.stock} restantes!` : `${producto.stock} en stock`}
                   </span>
+                )}
                 </div>
               </div>
 
