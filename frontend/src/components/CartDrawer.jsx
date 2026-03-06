@@ -16,6 +16,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     if (isOpen) {
       const scrollY = window.scrollY;
       document.body.classList.add('drawer-open');
+      document.body.classList.add('cart-open'); // ← mueve los toasts
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
@@ -24,6 +25,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     } else {
       const scrollY = parseInt(document.body.style.top || '0') * -1;
       document.body.classList.remove('drawer-open');
+      document.body.classList.remove('cart-open'); // ← restaura posición
       document.documentElement.style.overflow = 'unset';
       document.body.style.overflow = 'unset';
       document.body.style.position = 'unset';
@@ -33,6 +35,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     }
     return () => {
       document.body.classList.remove('drawer-open');
+      document.body.classList.remove('cart-open');
       document.documentElement.style.overflow = 'unset';
       document.body.style.overflow = 'unset';
       document.body.style.position = 'unset';

@@ -66,3 +66,24 @@ body.modal-open .whatsapp-float {
     display: none; /* Ocultamos el texto en móvil para no estorbar */
   }
 }
+
+@media (max-width: 768px) {
+  body.cart-open .Toastify__toast-container--bottom-right,
+  body.cart-open .Toastify__toast-container--bottom-center,
+  body.cart-open .Toastify__toast-container--bottom-left {
+    bottom: auto !important;
+    top: 16px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .Toastify__toast-container {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    min-width: 280px;
+  }
+}
