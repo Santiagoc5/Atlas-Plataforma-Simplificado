@@ -9,6 +9,7 @@ const Catalogo = () => {
   const [productos, setProductos] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [agregado, setAgregado] = useState({});
   const location = useLocation();
   const { hash } = location;
   const { addToCart } = useCart();
@@ -57,6 +58,15 @@ const Catalogo = () => {
       if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     }
   }, [hash, cargando, productos]);
+
+  const handleAddToCart = (e, prod) => {
+    e.stopPropagation();
+    addToCart(prod);
+    setAgregado((prev) => ({ ...prev, [prod.id_producto]: true }));
+    setTimeout(() => {
+      setAgregado((prev) => ({ ...prev, [prod.id_producto]: false }));
+    }, 1500);
+  };
 
   // Agrupación por categoría
   const agruparProductos = (lista) => {
@@ -300,11 +310,14 @@ const Catalogo = () => {
                       <button className="btn-detalles" onClick={(e) => { e.stopPropagation(); setProductoSeleccionado(prod); }}>Detalles</button>
                       <button
                         className="btn-agregar"
-                        onClick={(e) => { e.stopPropagation(); addToCart(prod); }}
+                        onClick={(e) => handleAddToCart(e, prod)}
                         disabled={prod.stock <= 0}
-                        style={{ backgroundColor: prod.stock > 0 ? '#e60000' : '#ccc', cursor: prod.stock > 0 ? 'pointer' : 'not-allowed' }}
+                        style={{
+                          backgroundColor: prod.stock <= 0 ? '#ccc' : agregado[prod.id_producto] ? '#16a34a' : '#e60000',
+                          cursor: prod.stock > 0 ? 'pointer' : 'not-allowed'
+                        }}
                       >
-                        {prod.stock > 0 ? 'Agregar' : 'Agotado'}
+                        {prod.stock <= 0 ? 'Agotado' : agregado[prod.id_producto] ? '¡Agregado!' : 'Agregar'}
                       </button>
                     </div>
                   </div>
@@ -331,7 +344,6 @@ const Catalogo = () => {
           display: flex; align-items: center; flex-wrap: wrap;
           background: #fff; border: 1px solid #e4e4e7; border-radius: 14px;
           padding: 0 4px;
-          /* SIN overflow:hidden — necesario para que el dropdown sea visible */
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
@@ -450,8 +462,9 @@ const Catalogo = () => {
         .producto-acciones { display:grid; grid-template-columns:1fr 1.3fr; gap:10px; margin-top:auto; }
         .btn-detalles { padding:10px 0; border-radius:8px; border:1px solid #ddd; background:white; font-size:13px; font-weight:600; cursor:pointer; transition:border-color 0.2s, color 0.2s; color:#111; }
         .btn-detalles:hover { border-color:#e60000; color:#e60000; }
-        .btn-agregar { padding:10px 0; border-radius:8px; border:none; color:white; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; transition:opacity 0.2s; }
+        .btn-agregar { padding:10px 0; border-radius:8px; border:none; color:white; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; transition:background-color 0.25s, transform 0.2s; }
         .btn-agregar:hover:not(:disabled) { opacity: 0.88; }
+        .btn-agregar:active:not(:disabled) { transform: scale(0.97); }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {

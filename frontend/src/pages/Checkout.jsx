@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { MapPin, Phone, User, Send, Info, Building2, Smartphone, Package, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { MapPin, Phone, User, Send, Info, Building2, Smartphone, Package, ShieldCheck, ShoppingBag } from 'lucide-react';
 
 const Checkout = () => {
   const { cart, totalPrecio } = useCart();
@@ -88,6 +89,11 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
+
+            <Link to="/catalogo" className="co-btn-catalog">
+              <ShoppingBag size={13} />
+              Agregar más productos
+            </Link>
 
             <div className="co-divider" />
 
@@ -265,7 +271,12 @@ const Checkout = () => {
             </p>
           </div>
 
-          <button className="co-btn-whatsapp" onClick={handleRealizarEnvio}>
+          <button
+            className="co-btn-whatsapp"
+            onClick={handleRealizarEnvio}
+            disabled={cart.length === 0}
+            style={cart.length === 0 ? { opacity: 0.4, cursor: 'not-allowed', transform: 'none', boxShadow: 'none' } : {}}
+          >
             <Send size={17} />
             Realizar el envío por WhatsApp
           </button>
@@ -275,10 +286,13 @@ const Checkout = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
+        html, body { max-width: 100%; overflow-x: hidden; }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         .co-page {
           min-height: 100vh;
+          width: 100%;
+          max-width: 100vw;
           background: #080808;
           display: flex;
           align-items: flex-start;
@@ -286,7 +300,7 @@ const Checkout = () => {
           padding: 100px 20px 60px;
           position: relative;
           font-family: 'Plus Jakarta Sans', sans-serif;
-          overflow-x: hidden;
+          overflow: hidden;
         }
 
         .co-noise {
@@ -297,19 +311,21 @@ const Checkout = () => {
         .co-container {
           position: relative; z-index: 1;
           width: 100%; max-width: 1020px;
+          min-width: 0;
           display: grid;
           grid-template-columns: 300px 1fr;
           gap: 20px;
           align-items: start;
         }
 
-        .co-summary { position: sticky; top: 100px; }
+        .co-summary { position: sticky; min-width: 0; }
 
         .co-summary-inner {
           background: #0d0d0d;
           border: 1px solid #1c1c1c;
           border-radius: 18px;
           padding: 24px;
+          min-width: 0;
         }
 
         .co-summary-header {
@@ -319,7 +335,7 @@ const Checkout = () => {
           margin-bottom: 20px;
         }
 
-        .co-items { display: flex; flex-direction: column; gap: 13px; }
+        .co-items { display: flex; flex-direction: column; gap: 13px; margin-bottom: 16px; }
         .co-empty { color: #3a3a3a; font-size: 13px; text-align: center; padding: 16px 0; }
 
         .co-item { display: flex; align-items: center; gap: 11px; }
@@ -337,6 +353,27 @@ const Checkout = () => {
         .co-item-name { display: block; color: #bbb; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
         .co-item-price { color: #555; font-size: 11px; }
 
+        .co-btn-catalog {
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+          width: 100%;
+          background: transparent;
+          border: 1px solid #1e1e1e;
+          border-radius: 9px;
+          padding: 10px;
+          color: #555;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 11px; font-weight: 600;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-bottom: 14px;
+        }
+        .co-btn-catalog:hover {
+          border-color: #2e2e2e;
+          color: #888;
+          background: #111;
+        }
+
         .co-divider { height: 1px; background: #181818; margin: 18px 0; }
 
         .co-total-row { display: flex; justify-content: space-between; align-items: baseline; }
@@ -348,6 +385,8 @@ const Checkout = () => {
           border: 1px solid #1c1c1c;
           border-radius: 18px;
           padding: 36px;
+          min-width: 0;
+          width: 100%;
         }
 
         .co-form-header { margin-bottom: 32px; }
@@ -447,12 +486,12 @@ const Checkout = () => {
           transition: all 0.22s;
           box-shadow: 0 6px 20px rgba(37,211,102,0.12);
         }
-        .co-btn-whatsapp:hover {
+        .co-btn-whatsapp:hover:not(:disabled) {
           background: #1fba5a;
           transform: translateY(-2px);
           box-shadow: 0 12px 28px rgba(37,211,102,0.22);
         }
-        .co-btn-whatsapp:active { transform: translateY(0); }
+        .co-btn-whatsapp:active:not(:disabled) { transform: translateY(0); }
 
         .co-animate { animation: coUp 0.3s ease; }
         @keyframes coUp {
@@ -521,30 +560,38 @@ const Checkout = () => {
         }
 
         @media (max-width: 820px) {
-          .co-container { grid-template-columns: 1fr; }
-          .co-summary { position: static; order: 2; }
-          .co-form-area { order: 1; }
-          .co-items { flex-direction: row; flex-wrap: wrap; gap: 10px; }
-          .co-item { width: calc(50% - 5px); }
+          .co-container {
+            grid-template-columns: 1fr !important;
+            gap: 16px;
+            width: 100%;
+          }
+          .co-summary { position: static; order: 2; width: 100%; }
+          .co-form-area { order: 1; width: 100%; }
+          .co-items { flex-direction: column; gap: 10px; }
+          .co-item { width: 100%; }
         }
 
         @media (max-width: 560px) {
-          .co-page { padding: 80px 12px 40px; }
-          .co-form-area { padding: 22px 16px; }
-          .co-summary-inner { padding: 20px; }
-          .co-title { font-size: 26px; }
-          .co-row { grid-template-columns: 1fr; gap: 0; }
-          .co-items { flex-direction: column; }
-          .co-item { width: 100%; }
+          .co-page { padding: 90px 12px 40px; }
+          .co-form-area { padding: 20px 14px; border-radius: 14px; }
+          .co-summary-inner { padding: 16px; border-radius: 14px; }
+          .co-title { font-size: 24px; }
+          .co-row { grid-template-columns: 1fr !important; gap: 0; }
+          .co-field input { font-size: 16px; }
           .co-shipping-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
           .co-ship-card { padding: 12px 10px; gap: 8px; }
           .co-ship-title { font-size: 11px; }
           .co-ship-desc { font-size: 9px; }
           .co-ship-icon { width: 30px; height: 30px; }
+          .co-summary-header { margin-bottom: 14px; }
+          .co-total-amount { font-size: 18px; }
+          .co-contra-block { padding: 14px; }
+          .co-contra-title { font-size: 12px; }
         }
 
         @media (max-width: 340px) {
           .co-shipping-grid { grid-template-columns: 1fr; }
+          .co-page { padding: 70px 8px 40px; }
         }
 
         .co-error {
