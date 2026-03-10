@@ -11,7 +11,7 @@ const Beneficios = () => {
     {
       icono: <Truck size={35} color="white" />,
       titulo: "Envío Nacional",
-      texto: "Cobertura en gran parte del país. Recíbelo en 2 a 3 días hábiles en ciudades principales."
+      texto: "Envíos en gran parte del país. Recíbelo en 2 a 3 días hábiles en ciudades principales."
     },
     {
       icono: <CreditCard size={35} color="white" />,

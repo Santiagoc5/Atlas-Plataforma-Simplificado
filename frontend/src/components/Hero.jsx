@@ -50,7 +50,7 @@ export default function Hero() {
     <span style={{ color: '#2ecc71' }}>✔</span> Garantía 6 meses
   </div>
   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
-    <span style={{ color: '#2ecc71' }}>✔</span> Cobertura en gran parte del país
+    <span style={{ color: '#2ecc71' }}>✔</span> Envíos en gran parte del país
   </div>
   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
     <span style={{ color: '#2ecc71' }}>✔</span> Pago contra entrega
