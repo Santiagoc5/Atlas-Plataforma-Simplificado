@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Package, ChevronDown, Check } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import ModalProducto from '../components/ModalProducto';
-import { API_BASE } from '../config';
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { Package, ChevronDown, Check } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import ModalProducto from "../components/ModalProducto";
+import { API_BASE } from "../config";
 
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
@@ -14,9 +14,13 @@ const Catalogo = () => {
   const { hash } = location;
   const { addToCart } = useCart();
 
-  const [filtros, setFiltros] = useState({ precioMax: 3000000, modelo: '', calidad: '' });
+  const [filtros, setFiltros] = useState({
+    precioMax: 3000000,
+    modelo: "",
+    calidad: "",
+  });
   const [modeloOpen, setModeloOpen] = useState(false);
-  const [modeloBusqueda, setModeloBusqueda] = useState('');
+  const [modeloBusqueda, setModeloBusqueda] = useState("");
   const modeloRef = useRef(null);
 
   // Cerrar dropdown al hacer click fuera
@@ -26,23 +30,29 @@ const Catalogo = () => {
         setModeloOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    const handleScroll = () => setModeloOpen(false);
+    window.addEventListener("scroll", handleScroll, true);
+    document.addEventListener("mousedown", handler);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
   }, []);
 
   // Carga de datos
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const searchTerm = queryParams.get('search')?.toLowerCase();
+    const searchTerm = queryParams.get("search")?.toLowerCase();
 
     fetch(`${API_BASE}/api/productos/`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setProductos(data);
         if (searchTerm) {
-          const encontrado = data.find(p =>
-            p.nombre.toLowerCase().includes(searchTerm) ||
-            String(p.id_producto) === searchTerm
+          const encontrado = data.find(
+            (p) =>
+              p.nombre.toLowerCase().includes(searchTerm) ||
+              String(p.id_producto) === searchTerm,
           );
           if (encontrado) setProductoSeleccionado(encontrado);
         }
@@ -54,8 +64,12 @@ const Catalogo = () => {
   // Scroll automático por hash
   useEffect(() => {
     if (!cargando && hash) {
-      const el = document.getElementById(hash.replace('#', ''));
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      const el = document.getElementById(hash.replace("#", ""));
+      if (el)
+        setTimeout(
+          () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
+          100,
+        );
     }
   }, [hash, cargando, productos]);
 
@@ -72,21 +86,26 @@ const Catalogo = () => {
   const agruparProductos = (lista) => {
     if (!lista || !Array.isArray(lista)) return [];
     const secciones = {};
-    lista.forEach(prod => {
-      const nombreCat = prod.categoria_nombre || (prod.id_categoria ? `${prod.id_categoria}` : 'General');
-      const idCat = String(nombreCat).toLowerCase().trim().replace(/\s+/g, '-');
-      if (!secciones[idCat]) secciones[idCat] = { id: idCat, titulo: nombreCat, items: [] };
+    lista.forEach((prod) => {
+      const nombreCat =
+        prod.categoria_nombre ||
+        (prod.id_categoria ? `${prod.id_categoria}` : "General");
+      const idCat = String(nombreCat).toLowerCase().trim().replace(/\s+/g, "-");
+      if (!secciones[idCat])
+        secciones[idCat] = { id: idCat, titulo: nombreCat, items: [] };
       secciones[idCat].items.push(prod);
     });
-    return Object.values(secciones).sort((a, b) => a.titulo.localeCompare(b.titulo));
+    return Object.values(secciones).sort((a, b) =>
+      a.titulo.localeCompare(b.titulo),
+    );
   };
 
   // Vehículos únicos desde producto.vehiculos (relación en BD)
   const vehiculosUnicos = (() => {
     const mapa = new Map();
-    productos.forEach(p => {
+    productos.forEach((p) => {
       if (!p.vehiculos || !Array.isArray(p.vehiculos)) return;
-      p.vehiculos.forEach(v => {
+      p.vehiculos.forEach((v) => {
         if (v.id_vehiculo && v.nombre_completo) {
           mapa.set(v.id_vehiculo, v.nombre_completo);
         }
@@ -94,33 +113,43 @@ const Catalogo = () => {
     });
     return [...mapa.entries()]
       .map(([id, nombre]) => ({ id, nombre }))
-      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+      .sort((a, b) =>
+        a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }),
+      );
   })();
 
-  const vehiculosFiltrados = vehiculosUnicos.filter(v =>
-    v.nombre.toLowerCase().includes(modeloBusqueda.toLowerCase())
+  const vehiculosFiltrados = vehiculosUnicos.filter((v) =>
+    v.nombre.toLowerCase().includes(modeloBusqueda.toLowerCase()),
   );
 
   // Filtrado
-  const productosFiltrados = productos.filter(prod => {
-    const precioEfectivo = prod.precio_oferta && Number(prod.precio_oferta) < Number(prod.precio)
-      ? Number(prod.precio_oferta) : Number(prod.precio);
+  const productosFiltrados = productos.filter((prod) => {
+    const precioEfectivo =
+      prod.precio_oferta && Number(prod.precio_oferta) < Number(prod.precio)
+        ? Number(prod.precio_oferta)
+        : Number(prod.precio);
     const cumplePrecio = precioEfectivo <= (filtros.precioMax || 5000000);
-    const cumpleModelo = !filtros.modelo || (
-      Array.isArray(prod.vehiculos) && prod.vehiculos.some(v => v.nombre_completo === filtros.modelo)
-    );
+    const cumpleModelo =
+      !filtros.modelo ||
+      (Array.isArray(prod.vehiculos) &&
+        prod.vehiculos.some((v) => v.nombre_completo === filtros.modelo));
     const cumpleCalidad = !filtros.calidad || prod.calidad === filtros.calidad;
     return cumplePrecio && cumpleModelo && cumpleCalidad;
   });
 
   const seccionesArray = agruparProductos(productosFiltrados);
-  const hayFiltrosActivos = filtros.modelo || filtros.calidad || filtros.precioMax < 5000000;
+  const hayFiltrosActivos =
+    filtros.modelo || filtros.calidad || filtros.precioMax < 5000000;
 
-  if (cargando) return <div style={{ padding: '150px', textAlign: 'center' }}>Cargando Catálogo Atlas...</div>;
+  if (cargando)
+    return (
+      <div style={{ padding: "150px", textAlign: "center" }}>
+        Cargando Catálogo Atlas...
+      </div>
+    );
 
   return (
     <div className="catalogo-container">
-
       <div className="catalogo-header">
         <h1>Catálogo de Productos</h1>
       </div>
@@ -128,80 +157,144 @@ const Catalogo = () => {
       {/* ─── BARRA DE FILTROS ─── */}
       <div className="filtros-wrapper">
         <div className="filtros-bar">
-
           {/* Título */}
           <div className="filtros-titulo">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
             <span>Filtros</span>
           </div>
 
           <div className="filtros-sep" />
 
           {/* ── Filtro Vehículo (dropdown) ── */}
-          <div className="filtro-grupo" ref={modeloRef} style={{ position: 'relative' }}>
+          <div
+            className="filtro-grupo"
+            ref={modeloRef}
+            style={{ position: "relative" }}
+          >
             <label className="filtro-label">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
               Vehículo
             </label>
             <button
               className="modelo-trigger"
-              onClick={() => { setModeloOpen(o => !o); setModeloBusqueda(''); }}
+              onClick={() => {
+                setModeloOpen((o) => !o);
+                setModeloBusqueda("");
+              }}
             >
-              <span className={filtros.modelo ? 'modelo-trigger__val' : 'modelo-trigger__placeholder'}>
-                {filtros.modelo || 'Seleccionar...'}
+              <span
+                className={
+                  filtros.modelo
+                    ? "modelo-trigger__val"
+                    : "modelo-trigger__placeholder"
+                }
+              >
+                {filtros.modelo || "Seleccionar..."}
               </span>
-              <ChevronDown size={13} style={{ flexShrink: 0, transform: modeloOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: '#9ca3af' }} />
+              <ChevronDown
+                size={13}
+                style={{
+                  flexShrink: 0,
+                  transform: modeloOpen ? "rotate(180deg)" : "none",
+                  transition: "transform 0.2s",
+                  color: "#9ca3af",
+                }}
+              />
             </button>
 
             {/* Panel — renderizado fuera del overflow con position fixed */}
-            {modeloOpen && (() => {
-              const rect = modeloRef.current?.getBoundingClientRect();
-              return (
-                <div
-                  className="modelo-panel"
-                  style={{
-                    position: 'fixed',
-                    top: rect ? rect.bottom + 8 : 0,
-                    left: rect ? rect.left : 0,
-                    width: 240,
-                    zIndex: 9999,
-                  }}
-                >
-                  <div className="modelo-panel__search">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input
-                      autoFocus
-                      type="text"
-                      placeholder="Buscar modelo..."
-                      value={modeloBusqueda}
-                      onChange={e => setModeloBusqueda(e.target.value)}
-                    />
-                  </div>
-                  <button
-                    className={`modelo-opcion ${filtros.modelo === '' ? 'modelo-opcion--active' : ''}`}
-                    onClick={() => { setFiltros({ ...filtros, modelo: '' }); setModeloOpen(false); }}
+            {modeloOpen &&
+              (() => {
+                const rect = modeloRef.current?.getBoundingClientRect();
+                return (
+                  <div
+                    className="modelo-panel"
+                    style={{
+                      position: "fixed",
+                      top: rect ? rect.bottom + 8 : 0,
+                      left: rect ? rect.left : 0,
+                      width: 240,
+                      zIndex: 9999,
+                    }}
                   >
-                    Todos los vehículos
-                    {filtros.modelo === '' && <Check size={13} />}
-                  </button>
-                  <div className="modelo-lista">
-                    {vehiculosFiltrados.length === 0
-                      ? <p className="modelo-vacio">Sin resultados</p>
-                      : vehiculosFiltrados.map(v => (
-                        <button
-                          key={v.id}
-                          className={`modelo-opcion ${filtros.modelo === v.nombre ? 'modelo-opcion--active' : ''}`}
-                          onClick={() => { setFiltros({ ...filtros, modelo: v.nombre }); setModeloOpen(false); setModeloBusqueda(''); }}
-                        >
-                          {v.nombre}
-                          {filtros.modelo === v.nombre && <Check size={13} />}
-                        </button>
-                      ))
-                    }
+                    <div className="modelo-panel__search">
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#9ca3af"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                      </svg>
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Buscar modelo..."
+                        value={modeloBusqueda}
+                        onChange={(e) => setModeloBusqueda(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      className={`modelo-opcion ${filtros.modelo === "" ? "modelo-opcion--active" : ""}`}
+                      onClick={() => {
+                        setFiltros({ ...filtros, modelo: "" });
+                        setModeloOpen(false);
+                      }}
+                    >
+                      Todos los vehículos
+                      {filtros.modelo === "" && <Check size={13} />}
+                    </button>
+                    <div className="modelo-lista">
+                      {vehiculosFiltrados.length === 0 ? (
+                        <p className="modelo-vacio">Sin resultados</p>
+                      ) : (
+                        vehiculosFiltrados.map((v) => (
+                          <button
+                            key={v.id}
+                            className={`modelo-opcion ${filtros.modelo === v.nombre ? "modelo-opcion--active" : ""}`}
+                            onClick={() => {
+                              setFiltros({ ...filtros, modelo: v.nombre });
+                              setModeloOpen(false);
+                              setModeloBusqueda("");
+                            }}
+                          >
+                            {v.nombre}
+                            {filtros.modelo === v.nombre && <Check size={13} />}
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })()}
+                );
+              })()}
           </div>
 
           <div className="filtros-sep" />
@@ -209,23 +302,38 @@ const Catalogo = () => {
           {/* ── Filtro Precio ── */}
           <div className="filtro-grupo filtro-grupo--precio">
             <label className="filtro-label">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
               Precio máximo
             </label>
             <div className="filtro-precio-input-wrap">
-                <span className="filtro-precio-signo">$</span>
-                <input
-                  type="number"
-                  className="filtro-precio-input"
-                  placeholder="Ej: 500000"
-                  value={filtros.precioMax === 5000000 ? '' : filtros.precioMax}
-                  min="0"
-                  onChange={e => {
-                    const val = e.target.value === '' ? 5000000 : Math.max(0, Number(e.target.value) || 0);
-                    setFiltros({ ...filtros, precioMax: val });
-                  }}
-                />
-              </div>
+              <span className="filtro-precio-signo">$</span>
+              <input
+                type="number"
+                className="filtro-precio-input"
+                placeholder="Ej: 500000"
+                value={filtros.precioMax === 5000000 ? "" : filtros.precioMax}
+                min="0"
+                onChange={(e) => {
+                  const val =
+                    e.target.value === ""
+                      ? 5000000
+                      : Math.max(0, Number(e.target.value) || 0);
+                  setFiltros({ ...filtros, precioMax: val });
+                }}
+              />
+            </div>
           </div>
 
           <div className="filtros-sep" />
@@ -233,13 +341,31 @@ const Catalogo = () => {
           {/* ── Filtro Calidad ── */}
           <div className="filtro-grupo">
             <label className="filtro-label">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
               Calidad
             </label>
             <div className="filtro-chips">
-              {[{ val: '', label: 'Todas' }, { val: 'Importado', label: 'Importado' }, { val: 'Nacional', label: 'Nacional' }].map(({ val, label }) => (
-                <button key={val} className={`filtro-chip ${filtros.calidad === val ? 'filtro-chip--active' : ''}`}
-                  onClick={() => setFiltros({ ...filtros, calidad: val })}>
+              {[
+                { val: "", label: "Todas" },
+                { val: "Importado", label: "Importado" },
+                { val: "Nacional", label: "Nacional" },
+              ].map(({ val, label }) => (
+                <button
+                  key={val}
+                  className={`filtro-chip ${filtros.calidad === val ? "filtro-chip--active" : ""}`}
+                  onClick={() => setFiltros({ ...filtros, calidad: val })}
+                >
                   {label}
                 </button>
               ))}
@@ -250,8 +376,25 @@ const Catalogo = () => {
           {hayFiltrosActivos && (
             <>
               <div className="filtros-sep" />
-              <button className="filtro-limpiar" onClick={() => setFiltros({ precioMax: 5000000, modelo: '', calidad: '' })}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <button
+                className="filtro-limpiar"
+                onClick={() =>
+                  setFiltros({ precioMax: 5000000, modelo: "", calidad: "" })
+                }
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
                 Limpiar
               </button>
             </>
@@ -259,29 +402,53 @@ const Catalogo = () => {
         </div>
 
         <div className="filtros-resultado">
-          <span className="filtros-resultado-num">{productosFiltrados.length}</span>
-          &nbsp;producto{productosFiltrados.length !== 1 ? 's' : ''}
-          {hayFiltrosActivos && <span className="filtros-resultado-tag"> · filtrado{productosFiltrados.length !== 1 ? 's' : ''}</span>}
+          <span className="filtros-resultado-num">
+            {productosFiltrados.length}
+          </span>
+          &nbsp;producto{productosFiltrados.length !== 1 ? "s" : ""}
+          {hayFiltrosActivos && (
+            <span className="filtros-resultado-tag">
+              {" "}
+              · filtrado{productosFiltrados.length !== 1 ? "s" : ""}
+            </span>
+          )}
         </div>
       </div>
 
       {/* ─── SECCIONES ─── */}
-      {seccionesArray.map(seccion => (
+      {seccionesArray.map((seccion) => (
         <section key={seccion.id} id={seccion.id} className="catalogo-seccion">
           <h2 className="seccion-titulo">{seccion.titulo}</h2>
           <div className="catalogo-grid">
-            {seccion.items.map(prod => {
-              const enOferta = prod.precio_oferta && Number(prod.precio_oferta) < Number(prod.precio);
-              const precioMostrar = enOferta ? Number(prod.precio_oferta) : Number(prod.precio);
+            {seccion.items.map((prod) => {
+              const enOferta =
+                prod.precio_oferta &&
+                Number(prod.precio_oferta) < Number(prod.precio);
+              const precioMostrar = enOferta
+                ? Number(prod.precio_oferta)
+                : Number(prod.precio);
               return (
-                <div key={prod.id_producto} className="producto-card" onClick={() => setProductoSeleccionado(prod)} style={{ cursor: 'pointer' }}>
+                <div
+                  key={prod.id_producto}
+                  className="producto-card"
+                  onClick={() => setProductoSeleccionado(prod)}
+                  style={{ cursor: "pointer" }}
+                >
                   <div className="producto-imagen">
                     <img
-                      src={!prod.imagen ? '/placeholder.jpg' : prod.imagen.startsWith('http') ? prod.imagen : `http://localhost:8000${prod.imagen}`}
+                      src={
+                        !prod.imagen
+                          ? "/placeholder.jpg"
+                          : prod.imagen.startsWith("http")
+                            ? prod.imagen
+                            : `http://localhost:8000${prod.imagen}`
+                      }
                       alt={prod.nombre}
                     />
                     {prod.calidad && (
-                      <span className={`prod-badge prod-badge--calidad ${prod.calidad.toLowerCase() === 'importado' ? 'prod-badge--red' : 'prod-badge--blue'}`}>
+                      <span
+                        className={`prod-badge prod-badge--calidad ${prod.calidad.toLowerCase() === "importado" ? "prod-badge--red" : "prod-badge--blue"}`}
+                      >
                         {prod.calidad}
                       </span>
                     )}
@@ -297,9 +464,13 @@ const Catalogo = () => {
                     <div className="producto-precio-row">
                       <div>
                         {enOferta && (
-                          <span className="producto-precio-antes">${Number(prod.precio).toLocaleString('es-CO')}</span>
+                          <span className="producto-precio-antes">
+                            ${Number(prod.precio).toLocaleString("es-CO")}
+                          </span>
                         )}
-                        <span className="producto-precio">${precioMostrar.toLocaleString('es-CO')}</span>
+                        <span className="producto-precio">
+                          ${precioMostrar.toLocaleString("es-CO")}
+                        </span>
                       </div>
                       <div className="producto-stock">
                         <Package size={13} />
@@ -307,17 +478,34 @@ const Catalogo = () => {
                       </div>
                     </div>
                     <div className="producto-acciones">
-                      <button className="btn-detalles" onClick={(e) => { e.stopPropagation(); setProductoSeleccionado(prod); }}>Detalles</button>
+                      <button
+                        className="btn-detalles"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setProductoSeleccionado(prod);
+                        }}
+                      >
+                        Detalles
+                      </button>
                       <button
                         className="btn-agregar"
                         onClick={(e) => handleAddToCart(e, prod)}
                         disabled={prod.stock <= 0}
                         style={{
-                          backgroundColor: prod.stock <= 0 ? '#ccc' : agregado[prod.id_producto] ? '#16a34a' : '#e60000',
-                          cursor: prod.stock > 0 ? 'pointer' : 'not-allowed'
+                          backgroundColor:
+                            prod.stock <= 0
+                              ? "#ccc"
+                              : agregado[prod.id_producto]
+                                ? "#16a34a"
+                                : "#e60000",
+                          cursor: prod.stock > 0 ? "pointer" : "not-allowed",
                         }}
                       >
-                        {prod.stock <= 0 ? 'Agotado' : agregado[prod.id_producto] ? '¡Agregado!' : 'Agregar'}
+                        {prod.stock <= 0
+                          ? "Agotado"
+                          : agregado[prod.id_producto]
+                            ? "¡Agregado!"
+                            : "Agregar"}
                       </button>
                     </div>
                   </div>
@@ -328,7 +516,10 @@ const Catalogo = () => {
         </section>
       ))}
 
-      <ModalProducto producto={productoSeleccionado} onClose={() => setProductoSeleccionado(null)} />
+      <ModalProducto
+        producto={productoSeleccionado}
+        onClose={() => setProductoSeleccionado(null)}
+      />
 
       <style>{`
         body { overflow-x: hidden; }

@@ -412,6 +412,18 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
     if (!form.sku.trim()) e.sku = "Requerido";
     if (!form.precio || isNaN(form.precio)) e.precio = "Inválido";
     if (form.stock === "" || isNaN(form.stock)) e.stock = "Inválido";
+
+    // Validación: precio oferta debe ser menor al precio regular
+    if (form.precio_oferta !== "" && form.precio_oferta !== null) {
+      const precioRegular = parseFloat(form.precio);
+      const precioOferta  = parseFloat(form.precio_oferta);
+      if (!isNaN(precioRegular) && !isNaN(precioOferta)) {
+        if (precioOferta >= precioRegular) {
+          e.precio_oferta = "El precio de oferta debe ser menor al precio regular";
+        }
+      }
+    }
+
     setErrors(e);
     return !Object.keys(e).length;
   };
@@ -446,10 +458,6 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
     finally { setLoading(false); }
   };
 
-  const F = ({ k, label, ...p }) => (
-    <InputField label={label} error={errors[k]} value={form[k]} onChange={set(k)} {...p} />
-  );
-
   const UploadPreview = ({ file, url, text }) => (
     <div>
       <img src={file ? URL.createObjectURL(file) : url} style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8, margin: "0 auto 8px", display: "block" }} alt="" />
@@ -467,8 +475,48 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
       </>}>
 
       <div className="section-lbl">Información básica</div>
-      <div className="grid2"><F k="nombre" label="Nombre" placeholder="Pastillas de freno XC200" /><F k="sku" label="SKU" placeholder="PF-XC-200" /></div>
-      <div className="grid3"><F k="precio" label="Precio regular" type="number" placeholder="59.99" /><F k="precio_oferta" label="Precio oferta" type="number" placeholder="49.99" /><F k="stock" label="Stock" type="number" placeholder="100" /></div>
+      <div className="grid2">
+        <InputField
+          label="Nombre"
+          error={errors.nombre}
+          value={form.nombre}
+          onChange={set("nombre")}
+          placeholder="Pastillas de freno XC200"
+        />
+        <InputField
+          label="SKU"
+          error={errors.sku}
+          value={form.sku}
+          onChange={set("sku")}
+          placeholder="PF-XC-200"
+        />
+      </div>
+      <div className="grid3">
+        <InputField
+          label="Precio regular"
+          error={errors.precio}
+          value={form.precio}
+          onChange={set("precio")}
+          type="number"
+          placeholder="59.99"
+        />
+        <InputField
+          label="Precio oferta"
+          error={errors.precio_oferta}
+          value={form.precio_oferta}
+          onChange={set("precio_oferta")}
+          type="number"
+          placeholder="49.99"
+        />
+        <InputField
+          label="Stock"
+          error={errors.stock}
+          value={form.stock}
+          onChange={set("stock")}
+          type="number"
+          placeholder="100"
+        />
+      </div>
 
       <div className="section-lbl">Detalles</div>
       <div className="grid2">
@@ -483,8 +531,21 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
             <option>Nacional</option><option>Importado</option>
           </select>
         </Field>
-        <F k="peso" label="Peso (kg)" type="number" placeholder="0.5" />
-        <F k="dimensiones" label="Dimensiones" placeholder="10x5x3 cm" />
+        <InputField
+          label="Peso (kg)"
+          error={errors.peso}
+          value={form.peso}
+          onChange={set("peso")}
+          type="number"
+          placeholder="0.5"
+        />
+        <InputField
+          label="Dimensiones"
+          error={errors.dimensiones}
+          value={form.dimensiones}
+          onChange={set("dimensiones")}
+          placeholder="10x5x3 cm"
+        />
       </div>
       <Field label="Descripción">
         <textarea className="input" rows={3} value={form.descripcion} onChange={e => set("descripcion")(e.target.value)} placeholder="Descripción detallada..." />
