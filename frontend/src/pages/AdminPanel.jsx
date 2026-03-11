@@ -284,7 +284,7 @@ const Field = ({ label, error, children }) => (
 
 const InputField = ({ label, error, value, onChange, ...props }) => (
   <Field label={label} error={error}>
-    <input className="input" value={value} onChange={e => onChange(e.target.value)} {...props} />
+    <input className="input" value={value} onChange={e => onChange(e.target.value)} onWheel={e => e.target.blur()} {...props} />
   </Field>
 );
 
