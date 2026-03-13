@@ -11,7 +11,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 import TodasLasOfertas from './pages/TodasLasOfertas';
 import Checkout from './pages/Checkout';
 import { CartProvider } from './context/CartContext';
-import AdminPanel from './pages/AdminPanel';
+import AdminPanel from "./admin/index.jsx";
 import './App.css';
 
 const AppContent = () => {
@@ -21,21 +21,21 @@ const AppContent = () => {
   return (
     <CartProvider>
       <ToastContainer
-  position="bottom-right"
-  autoClose={2500}
-  hideProgressBar
-  closeButton={false}
-/>
+      position="bottom-right"
+      autoClose={2500}
+      hideProgressBar={false}
+      closeButton={false}
+      />
       <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white' }}>
         {!isAdmin && <Navbar />}
         {!isAdmin && <WhatsAppButton />}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/todas-las-ofertas" element={<TodasLasOfertas />} />
           <Route path="/catalogo" element={<Catálogo />} />
           <Route path="/contacto" element={<Contacto />} />
+          <Route path="/admin/*" element={<AdminPanel />} />
         </Routes>
         {!isAdmin && <Footer />}
       </div>
