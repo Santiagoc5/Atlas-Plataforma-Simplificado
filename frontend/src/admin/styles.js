@@ -214,6 +214,9 @@ const styles = `
   .Toastify__progress-bar--warning { background: #f59e0b !important; opacity: 0.5 !important; }
   .Toastify__progress-bar--info    { background: #3b82f6 !important; opacity: 0.5 !important; }
   .Toastify__progress-bar { height: 2px !important; border-radius: 0 0 14px 14px !important; }
+
+  .logout-btn { color: var(--text3); cursor: pointer; display: flex; transition: color var(--transition); }
+  .logout-btn:hover { color: var(--accent); }
 `;
 
 export default styles;
