@@ -192,14 +192,14 @@ const Ofertas = () => {
 
         @media (max-width:960px) {
           .ofertas-grid { grid-template-columns:repeat(2,1fr); }
-          .oferta-card:nth-child(3) { grid-column:1/-1; max-width:420px; margin:0 auto; width:100%; }
+          .oferta-card:nth-child(3) { grid-column: 1/-1; width: calc(50% - 12px); margin: 0 auto; }
         }
         @media (max-width:640px) {
           .ofertas-section { padding:32px 20px; border-radius:18px; width:calc(100% - 32px); margin:32px auto; }
           .ofertas-header { flex-direction:column; align-items:flex-start; gap:16px; margin-bottom:28px; }
           .ofertas-badge { width:100%; justify-content:space-between; }
           .ofertas-grid { grid-template-columns:1fr; gap:18px; }
-          .oferta-card:nth-child(3) { grid-column:auto; max-width:100%; }
+          .oferta-card:nth-child(3) { grid-column:auto; width:100%; margin:0; }
         }
         @media (max-width:400px) {
           .ofertas-title { font-size:1.4rem; }

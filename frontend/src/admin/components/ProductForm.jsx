@@ -207,14 +207,14 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
           error={errors.nombre}
           value={form.nombre}
           onChange={set("nombre")}
-          placeholder="Pastillas de freno XC200"
+          placeholder="Ej: Bomper Trasero Toyota Hilux 2006 - 2016"
         />
         <InputField
           label="SKU"
           error={errors.sku}
           value={form.sku}
           onChange={set("sku")}
-          placeholder="PF-XC-200"
+          placeholder="BOMT-HLX-001"
         />
       </div>
       <div className="grid3">
@@ -224,7 +224,7 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
           value={form.precio}
           onChange={set("precio")}
           type="number"
-          placeholder="59.99"
+          placeholder="100.000"
         />
         <InputField
           label="Precio oferta"
@@ -232,7 +232,7 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
           value={form.precio_oferta}
           onChange={set("precio_oferta")}
           type="number"
-          placeholder="49.99"
+          placeholder="50.000"
           disabled={parseInt(form.stock) === 0}
         />
         <InputField

@@ -147,6 +147,25 @@ def admin_eliminar_categoria(request, pk):
         return Response(status=204)
     except Categoria.DoesNotExist:
         return Response({'error': 'Categoría no encontrada'}, status=404)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def admin_editar_categoria(request, pk):
+    if not request.user.is_superuser:
+        return Response({'error': 'No autorizado'}, status=403)
+    try:
+        categoria = Categoria.objects.get(pk=pk)
+        nombre = request.data.get('nombre', '').strip()
+        if not nombre:
+            return Response({'error': 'El nombre es requerido'}, status=400)
+        if Categoria.objects.filter(nombre=nombre).exclude(pk=pk).exists():
+            return Response({'error': 'Ya existe una categoría con ese nombre'}, status=400)
+        categoria.nombre = nombre
+        categoria.save()
+        return Response(CategoriaSerializer(categoria).data)
+    except Categoria.DoesNotExist:
+        return Response({'error': 'Categoría no encontrada'}, status=404)
     
 # ─── ADMIN: VEHÍCULOS ─────────────────────────────────────────────────────────
 

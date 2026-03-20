@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { Plus, Tag, Trash2 } from "lucide-react";
+import { Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { api } from "../api";
 import useFetch from "../hooks/useFetch";
 import CardHeader from "../ui/CardHeader";
@@ -14,6 +14,9 @@ const CategoriesPanel = ({ token }) => {
 
   const [name, setName]       = useState("");
   const [saving, setSaving]   = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const [confirm, setConfirm] = useState(null);
 
   const handleCreate = async () => {
@@ -37,6 +40,35 @@ const CategoriesPanel = ({ token }) => {
     setConfirm(null);
   };
 
+  const startEdit = (cat) => {
+    setEditing(cat.id_categoria);
+    setEditName(cat.nombre);
+  };
+
+  const cancelEdit = () => {
+    setEditing(null);
+    setEditName("");
+  };
+
+  const handleEdit = async (id) => {
+    if (!editName.trim()) return toast.error("Nombre requerido");
+    setSavingEdit(true);
+    try {
+      await api(
+        `/api/admin/categorias/${id}/editar/`,
+        { method: "PATCH", body: JSON.stringify({ nombre: editName.trim() }) },
+        token
+      );
+      toast.success("Categoría actualizada");
+      cancelEdit();
+      reload();
+    } catch (e) {
+      toast.error(e?.nombre?.[0] || e?.error || "Error al editar");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   return (
     <div>
       <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Categorías</h2>
@@ -51,7 +83,7 @@ const CategoriesPanel = ({ token }) => {
               label="Nombre"
               value={name}
               onChange={setName}
-              placeholder="Ej: Frenos"
+              placeholder="Ej: Ampliaciones"
               onKeyDown={e => e.key === "Enter" && handleCreate()}
             />
             <button className="btn btn-primary" style={{ justifyContent: "center" }} onClick={handleCreate} disabled={saving}>
@@ -76,12 +108,43 @@ const CategoriesPanel = ({ token }) => {
                     <tbody>
                       {cats.map(c => (
                         <tr key={c.id_categoria}>
-                          <td><span style={{ fontWeight: 700 }}>{c.nombre}</span></td>
+                          <td>
+                            {editing === c.id_categoria ? (
+                              <input
+                                className="input"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") handleEdit(c.id_categoria);
+                                  if (e.key === "Escape") cancelEdit();
+                                }}
+                                autoFocus
+                              />
+                            ) : (
+                              <span style={{ fontWeight: 700 }}>{c.nombre}</span>
+                            )}
+                          </td>
                           <td className="act">
-                            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                              <button className="btn btn-danger btn-sm" onClick={() => setConfirm(c)}>
-                                <Trash2 size={14} /> Eliminar
-                              </button>
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                              {editing === c.id_categoria ? (
+                                <>
+                                  <button className="btn btn-primary btn-sm" onClick={() => handleEdit(c.id_categoria)} disabled={savingEdit}>
+                                    {savingEdit ? <Spinner /> : "Guardar"}
+                                  </button>
+                                  <button className="btn btn-ghost btn-sm" onClick={cancelEdit} disabled={savingEdit}>
+                                    <X size={14} /> Cancelar
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button className="btn btn-ghost btn-sm" onClick={() => startEdit(c)}>
+                                    <Pencil size={14} /> Editar
+                                  </button>
+                                  <button className="btn btn-danger btn-sm" onClick={() => setConfirm(c)}>
+                                    <Trash2 size={14} /> Eliminar
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
