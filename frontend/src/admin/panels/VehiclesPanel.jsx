@@ -69,10 +69,10 @@ const VehiclesPanel = ({ token }) => {
               label="Nombre completo"
               value={name}
               onChange={setName}
-              placeholder="Toyota Hilux 2020"
+              placeholder="Toyota Hilux"
               onKeyDown={e => e.key === "Enter" && handleCreate()}
             />
-            <p style={{ fontSize: 11, color: "var(--text3)", marginTop: 6 }}>Formato: Marca, Modelo, Año</p>
+            <p style={{ fontSize: 11, color: "var(--text3)", marginTop: 6 }}>Formato: Marca, Modelo</p>
             <button className="btn btn-primary" style={{ marginTop: 14, width: "100%", justifyContent: "center" }} onClick={handleCreate} disabled={saving}>
               {saving ? <Spinner /> : <Plus size={16} />} Agregar
             </button>
@@ -81,8 +81,8 @@ const VehiclesPanel = ({ token }) => {
 
         {/* ── Listado ── */}
         <div className="card">
-          <CardHeader icon={<Search size={15} color="var(--accent)" />} title="">
-            <div className="search-wrap" style={{ flex: 1 }}>
+          <CardHeader title="">
+            <div className="search-wrap">
               <div className="search-icon"><Search size={15} /></div>
               <input className="input" placeholder="Filtrar vehículos..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
@@ -96,12 +96,11 @@ const VehiclesPanel = ({ token }) => {
                 : (
                   <table>
                     <thead>
-                      <tr><th>#</th><th>Nombre</th><th style={{ textAlign: "right" }}>Acciones</th></tr>
+                      <tr><th>Nombre</th><th style={{ textAlign: "right" }}>Acciones</th></tr>
                     </thead>
                     <tbody>
                       {filtered.map(v => (
                         <tr key={v.id_vehiculo}>
-                          <td style={{ color: "var(--text3)", fontSize: 12 }}>{v.id_vehiculo}</td>
                           <td style={{ fontWeight: 600 }}>{v.nombre_completo}</td>
                           <td className="act">
                             <div style={{ display: "flex", gap: 8 }}>

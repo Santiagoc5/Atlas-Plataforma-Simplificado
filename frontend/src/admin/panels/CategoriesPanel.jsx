@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { Pencil, Plus, Tag, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Search, Tag, Trash2, X } from "lucide-react";
 import { api } from "../api";
 import useFetch from "../hooks/useFetch";
 import CardHeader from "../ui/CardHeader";
@@ -12,6 +12,7 @@ import Spinner from "../ui/Spinner";
 const CategoriesPanel = ({ token }) => {
   const { data: cats, loading, reload } = useFetch("/api/admin/categorias/", token);
 
+  const [search, setSearch]   = useState("");
   const [name, setName]       = useState("");
   const [saving, setSaving]   = useState(false);
   const [editing, setEditing] = useState(null);
@@ -69,6 +70,10 @@ const CategoriesPanel = ({ token }) => {
     }
   };
 
+  const filtered = (cats || []).filter(c =>
+    !search || c.nombre.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Categorías</h2>
@@ -94,19 +99,27 @@ const CategoriesPanel = ({ token }) => {
 
         {/* ── Listado ── */}
         <div className="card">
-          <CardHeader icon={<Tag size={16} color="var(--accent)" />} title={`${(cats || []).length} Categorías`} />
-          <div className="table-wrap mc">
+          <CardHeader title="">
+            <div className="search-wrap">
+              <div className="search-icon"><Search size={15} /></div>
+              <input className="input" placeholder="Filtrar categorías..." value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+            <span style={{ fontSize: 12, color: "var(--text3)", whiteSpace: "nowrap" }}>{filtered.length} resultados</span>
+          </CardHeader>
+          <div className="table-wrap mc" style={{ maxHeight: 460, overflowY: "auto" }}>
             {loading
               ? <div className="loading-c"><Spinner /></div>
               : !cats?.length
                 ? <EmptyState icon={<Tag size={40} />} text="Sin categorías aún" />
+                : !filtered.length
+                  ? <EmptyState icon={<Tag size={40} />} text="Sin resultados para tu búsqueda" />
                 : (
                   <table>
                     <thead>
                       <tr><th>Nombre</th><th style={{ textAlign: "right" }}>Acción</th></tr>
                     </thead>
                     <tbody>
-                      {cats.map(c => (
+                      {filtered.map(c => (
                         <tr key={c.id_categoria}>
                           <td>
                             {editing === c.id_categoria ? (

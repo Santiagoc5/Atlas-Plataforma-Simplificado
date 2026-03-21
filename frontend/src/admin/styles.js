@@ -47,6 +47,9 @@ const styles = `
   .card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; animation:fadeIn .28s ease both; }
   .card-header { padding:16px 22px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); }
   .card-title { font-size:14px; font-weight:700; flex:1; }
+  .card-header .card-title:empty { display:none; }
+  .card-header .search-wrap { flex:1; min-width:0; }
+  .card-header .search-wrap + span { flex-shrink:0; }
   .table-wrap { overflow-x:auto; }
   table { width:100%; border-collapse:collapse; }
   thead tr { border-bottom:1px solid var(--border); }
