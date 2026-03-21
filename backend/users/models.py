@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+"""
+Definición del modelo de Usuario personalizado y su Manager.
+Reemplaza el modelo por defecto de Django para permitir la autenticación 
+centralizada mediante 'username' (obviando el correo estándar)
+e incorpora roles básicos (staff/superuser) para acceder al panel.
+"""
+
 class UsuarioManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
@@ -28,7 +35,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     objects = UsuarioManager()
     
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['nombre']  # Datos adicionales al crear superuser
+    # Campos obligatorios adicionales al ejecutar createsuperuser.
+    REQUIRED_FIELDS = ['nombre']
 
     class Meta:
         managed = True 

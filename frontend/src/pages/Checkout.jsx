@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 import { MapPin, Phone, User, Send, Info, Building2, Smartphone, Package, ShieldCheck, ShoppingBag } from 'lucide-react';
 
 const Checkout = () => {
+  // Obtenemos el carrito y el precio total desde el contexto
   const { cart, totalPrecio } = useCart();
 
-  const [tipoEnvio, setTipoEnvio] = useState('domicilio');
+  // Estados locales para el formulario y el tipo de envío
+  const [tipoEnvio, setTipoEnvio] = useState('domicilio'); // 'domicilio' u 'oficina'
   const [formData, setFormData] = useState({
     nombre: '',
     cedula: '',
@@ -16,8 +18,14 @@ const Checkout = () => {
     ciudad: '',
   });
 
+  // Estado que guarda los posibles errores de validación del formulario
   const [errores, setErrores] = useState({});
 
+  /**
+   * Valida que todos los campos requeridos estén completos antes de enviar.
+   * La dirección solo es requerida si el tipo de envío es a domicilio.
+   * @returns {boolean} true si no hay errores, false en caso contrario.
+   */
   const validar = () => {
     const e = {};
     if (!formData.nombre.trim())   e.nombre   = 'Requerido';
@@ -26,17 +34,26 @@ const Checkout = () => {
     if (!formData.direccion.trim() && tipoEnvio === 'domicilio') e.direccion = 'Requerido';
     if (!formData.municipio.trim()) e.municipio = 'Requerido';
     if (!formData.ciudad.trim())    e.ciudad    = 'Requerido';
+    
     setErrores(e);
     return Object.keys(e).length === 0;
   };
 
+  /**
+   * Procesa la información del pedido y redirige a WhatsApp
+   * con un mensaje pre-formateado con los detalles del pago y envío.
+   */
   const handleRealizarEnvio = () => {
-    if (!validar()) return;
+    if (!validar()) return; // Detiene el envío si faltan campos
+    
+    // Número al que se enviará el pedido
     const numeroDuenio = "573005307606";
 
+    // Formatear la lista de productos
     const listaProductos = cart.map(item => `- ${item.nombre} (x${item.cantidad})`).join('\n');
     const total = totalPrecio;
 
+    // Estructurar el lugar de entrega según la modalidad elegida
     let lugarEntrega;
     if (tipoEnvio === 'domicilio') {
       const partes = [formData.direccion, formData.municipio, formData.ciudad].filter(Boolean);
@@ -48,6 +65,7 @@ const Checkout = () => {
         : 'OFICINA PRINCIPAL INTERRAPIDÍSIMO';
     }
 
+    // Estructurar el cuerpo del mensaje de WhatsApp
     const mensaje =
   `🛒✨ *Nuevo Pedido - Atlas* ✨🛒\n\n` +
   `👤 *Nombre:* ${formData.nombre}\n` +
@@ -56,6 +74,8 @@ const Checkout = () => {
   `📍 Entrega: ${lugarEntrega}\n\n` +
   `🧾 Productos:\n${listaProductos}\n\n` +
   `💵 Total: $${total.toLocaleString('es-CO')}`;
+  
+    // Apertura del enlace de WhatsApp en una nueva pestaña
     window.open(`https://wa.me/${numeroDuenio}?text=${encodeURIComponent(mensaje)}`, '_blank');
   };
 
@@ -267,7 +287,7 @@ const Checkout = () => {
               </div>
             </div>
             <p className="co-contra-desc">
-              Nuestros paquetes los enviamos a <b>oficina principal de Interrapidísimo</b> para que tengan la facilidad de reclamar sus productos.
+              Nuestros paquetes los enviamos a <b>oficina principal de Interrapidísimo</b> para que tengan la facilidad de reclamar sus productos. El valor del flete se cobra por aparte.
             </p>
           </div>
 
@@ -278,7 +298,7 @@ const Checkout = () => {
             style={cart.length === 0 ? { opacity: 0.4, cursor: 'not-allowed', transform: 'none', boxShadow: 'none' } : {}}
           >
             <Send size={17} />
-            Realizar el envío por WhatsApp
+            Confirmar pedido por WhatsApp
           </button>
         </main>
       </div>

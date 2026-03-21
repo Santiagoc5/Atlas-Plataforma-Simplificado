@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../config';
 import ModalProducto from './ModalProducto';
 
+/**
+ * Sección de Ofertas Relámpago.
+ * Obtiene los productos en oferta desde el backend y muestra
+ * un máximo de 3 en la landing page.
+ */
 const Ofertas = () => {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);

@@ -1,17 +1,25 @@
-import { AlertTriangle, Box, Check, Percent, Tag } from "lucide-react";
+import { AlertTriangle, Box, Percent, Tag, Clock, Car } from "lucide-react";
 import useFetch from "../hooks/useFetch";
 import CardHeader from "../ui/CardHeader";
 
+/**
+ * Panel de inicio (Dashboard) para administradores.
+ * Muestra métricas clave y el estado general del catálogo con base en datos del backend.
+ */
 const Dashboard = ({ token }) => {
   const { data: stats } = useFetch("/api/admin/stats/", token);
+  const { data: products } = useFetch("/api/admin/productos/", token);
 
   const cards = stats ? [
     { label: "Total Productos",  value: stats.total_productos,  icon: <Box size={20} />,          color: "var(--info)",    bg: "var(--info-dim)"    },
     { label: "En Oferta",        value: stats.en_oferta,        icon: <Percent size={20} />,       color: "var(--accent)",  bg: "var(--accent-dim)"  },
     { label: "Sin Stock",        value: stats.sin_stock,        icon: <AlertTriangle size={20} />, color: "var(--accent)",  bg: "var(--danger-dim)"  },
     { label: "Categorías",       value: stats.total_categorias, icon: <Tag size={20} />,           color: "var(--success)", bg: "var(--success-dim)" },
-    { label: "Usuarios Activos", value: stats.total_usuarios,   icon: <Check size={20} />,         color: "#a855f7",        bg: "rgba(168,85,247,.1)"},
+    { label: "Vehículos",        value: stats.total_vehiculos,  icon: <Car size={20} />,           color: "#a855f7",        bg: "rgba(168,85,247,.1)"},
   ] : [];
+
+  const agotados = products ? products.filter(p => p.stock === 0) : [];
+  const recientes = products ? products.slice(0, 5) : [];
 
   return (
     <div>
@@ -43,19 +51,77 @@ const Dashboard = ({ token }) => {
         }
       </div>
 
-      <div className="card" style={{ marginTop: 20 }}>
-        <CardHeader icon={<AlertTriangle size={18} color="var(--warning)" />} title="Estado del Catálogo" />
-        <div style={{ padding: 24, display: "flex", gap: 16, flexWrap: "wrap" }}>
-          {[
-            stats?.sin_stock > 0  && { bg: "var(--danger-dim)",  icon: <AlertTriangle size={16} color="var(--danger)" />,  text: `${stats.sin_stock} producto(s) sin stock`,        c: "var(--danger)"  },
-            stats?.en_oferta > 0  && { bg: "var(--success-dim)", icon: <Check size={16} color="var(--success)" />,          text: `${stats.en_oferta} producto(s) en oferta activa`, c: "var(--success)" },
-            stats && !stats.sin_stock && !stats.en_oferta && { bg: "var(--success-dim)", icon: <Check size={16} color="var(--success)" />, text: "Todo en orden", c: "var(--success)" },
-          ].filter(Boolean).map((item, i) => (
-            <div key={i} style={{ padding: "10px 16px", background: item.bg, borderRadius: 8, display: "flex", alignItems: "center", gap: 8 }}>
-              {item.icon}
-              <span style={{ fontSize: 13, color: item.c, fontWeight: 600 }}>{item.text}</span>
-            </div>
-          ))}
+      <div className="grid2" style={{ marginTop: 24 }}>
+        {/* Productos Agotados */}
+        <div className="card">
+          <CardHeader icon={<AlertTriangle size={18} color="var(--danger)" />} title="Productos Agotados" />
+          <div className="table-wrap mc">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Stock/ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!products ? (
+                  <tr><td colSpan="2" className="loading-c"><div className="spinner"/></td></tr>
+                ) : agotados.length === 0 ? (
+                  <tr><td colSpan="2"><div className="empty">Todo el catálogo tiene stock 🎉</div></td></tr>
+                ) : (
+                  agotados.map(p => (
+                    <tr key={p.id_producto}>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <img src={p.imagen || "/placeholder.jpg"} alt="" style={{ width: 34, height: 34, borderRadius: 6, objectFit: "cover", background: "var(--bg3)" }} />
+                          <div style={{ fontWeight: 600, maxWidth: 180, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.nombre}</div>
+                        </div>
+                      </td>
+                      <td><span className="badge badge-danger">Agotado</span></td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Últimos Productos */}
+        <div className="card">
+          <CardHeader icon={<Clock size={18} color="var(--info)" />} title="Últimos Añadidos" />
+          <div className="table-wrap mc">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!products ? (
+                  <tr><td colSpan="2" className="loading-c"><div className="spinner"/></td></tr>
+                ) : recientes.length === 0 ? (
+                  <tr><td colSpan="2"><div className="empty">No hay productos aún</div></td></tr>
+                ) : (
+                  recientes.map(p => (
+                    <tr key={p.id_producto}>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <img src={p.imagen || "/placeholder.jpg"} alt="" style={{ width: 34, height: 34, borderRadius: 6, objectFit: "cover", background: "var(--bg3)" }} />
+                          <div style={{ fontWeight: 600, maxWidth: 180, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {p.nombre}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ fontWeight: 700 }}>
+                        ${parseFloat(p.precio).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

@@ -10,6 +10,10 @@ import ConfirmDialog from "../ui/ConfirmDialog";
 import Spinner from "../ui/Spinner";
 import ProductForm from "../components/ProductForm";
 
+/**
+ * Panel completo para la gestión de productos (CRUD).
+ * Permite listar, filtrar, paginar, crear, editar y eliminar productos del catálogo.
+ */
 const ProductsPanel = ({ token }) => {
   const { data: products, loading, reload } = useFetch("/api/admin/productos/", token);
   const { data: categorias }               = useFetch("/api/admin/categorias/", token);
@@ -51,7 +55,7 @@ const ProductsPanel = ({ token }) => {
           </p>
         </div>
         <button className="btn btn-primary" onClick={() => { setEditing(null); setFormOpen(true); }}>
-          <Plus size={16} /> Nuevo Producto
+          <Plus size={16} /> Agregar Producto
         </button>
       </div>
 

@@ -1,6 +1,13 @@
 from django.db import models
 
-# Create your models here.
+"""
+Modelos base de la aplicación de Productos.
+Define la estructura de la base de datos para:
+- Categorías (Categoria).
+- Productos principales (Producto).
+- Vehículos compatibles (Vehiculo y ProductoVehiculo para la relación N:M).
+- Galería de imágenes adicionales (ImagenProducto).
+"""
 
 class Categoria(models.Model):
     id_categoria = models.AutoField(primary_key=True)
@@ -31,7 +38,8 @@ class Producto(models.Model):
 
     calidad = models.CharField(
         max_length=20, 
-        choices=CALIDAD_CHOICES, # Esto crea el select en el Admin
+        # El campo usa choices para forzar valores válidos y mostrar select en admin.
+        choices=CALIDAD_CHOICES,
         default='Nacional'
     )
     caracteristicas = models.TextField(null=True, blank=True, help_text="Separa cada característica con una coma")
@@ -57,9 +65,9 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
-    # Lógica para calcular el porcentaje de descuento (Ej: -20%)
     @property
     def porcentaje_descuento(self):
+        # Valor derivado para el frontend; evita persistir datos calculados en DB.
         if self.en_oferta and self.precio_oferta and self.precio > 0:
             ahorro = self.precio - self.precio_oferta
             porcentaje = (ahorro / self.precio) * 100

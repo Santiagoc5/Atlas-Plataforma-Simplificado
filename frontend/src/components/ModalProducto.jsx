@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
+/**
+ * Componente modal para ver los detalles interactivos de un producto.
+ * Maneja galería de imágenes, precios, stock y bloquea el scroll del body.
+ */
 const ModalProducto = ({ producto, onClose }) => {
   const [indexFoto, setIndexFoto] = useState(0);
   const [agregado, setAgregado] = useState(false);

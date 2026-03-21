@@ -3,6 +3,11 @@ import { X } from "lucide-react";
 import { api } from "../api";
 import SearchInput from "../ui/SearchInput";
 
+/**
+ * Componente híbrido de búsqueda y selección múltiple de vehículos.
+ * Realiza peticiones predictivas al backend mientras se escribe
+ * y retorna la lista de vehículos compatibles seleccionados.
+ */
 const VehicleSelector = ({ token, selected, onChange }) => {
   const [query, setQuery]     = useState("");
   const [results, setResults] = useState([]);

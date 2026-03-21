@@ -1,4 +1,5 @@
 const reportWebVitals = onPerfEntry => {
+  // Carga diferida para no impactar el bundle inicial.
   if (onPerfEntry && onPerfEntry instanceof Function) {
     import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
       getCLS(onPerfEntry);

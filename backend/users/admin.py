@@ -2,6 +2,12 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Usuario
 
+"""
+Configuración del panel administrativo para el modelo de Usuarios.
+Reutiliza la lógica de seguridad de 'UserAdmin' nativo de Django, 
+pero la adapta para mostrar y controlar las propiedades de nuestro modelo personalizado.
+"""
+
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
     list_display = ('username', 'nombre', 'is_active', 'is_staff', 'is_superuser')
@@ -23,10 +29,9 @@ class UsuarioAdmin(UserAdmin):
     ordering      = ('username',)
     search_fields = ('username', 'nombre')
     
-    # Para cambiar contraseña y username desde el detalle del usuario
+    # Endurece permisos en admin: un staff no puede elevar privilegios de superusuario.
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if obj and not request.user.is_superuser:
-            # Un staff no puede editar superusuarios
             form.base_fields['is_superuser'].disabled = True
         return form

@@ -5,38 +5,50 @@ import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import { API_BASE } from '../config';
 
+/**
+ * Componente Navbar para la navegación principal del usuario.
+ * Contiene un input de búsqueda predictiva, carrito y menú dinámico 
+ * que se ajusta y oculta en tamaños de dispositivos móviles.
+ */
 const Navbar = () => {
+  // Estados para el responsive y los menús desplegables
   const [isOpen, setIsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [catalogOpenMobile, setCatalogOpenMobile] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // Estado para el control del carrito
   const [isCartOpen, setIsCartOpen] = useState(false);
+  // Variables del carrito y la ruta actual
   const { totalItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const isCatalogoActive = location.pathname.startsWith('/catalogo');
 
+  // Estados relacionados con la búsqueda predictiva de productos
   const [searchTerm, setSearchTerm] = useState('');
   const [sugerencias, setSugerencias] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  // Efecto principal que gestiona la solicitud de datos de la búsqueda inteligente (Debounce simple)
   useEffect(() => {
     const buscar = async () => {
+      // Solo busca si hay más de 1 caracter
       if (searchTerm.length > 1) {
         try {
           const res = await fetch(`${API_BASE}/api/predictivo/?q=${searchTerm}`);
           const data = await res.json();
           setSugerencias(data);
           setShowDropdown(true);
-        } catch (e) { }
+        } catch (e) { console.error("Error buscando"); }
       } else {
         setSugerencias([]);
         setShowDropdown(false);
       }
     };
-    const t = setTimeout(buscar, 300);
+    const t = setTimeout(buscar, 300); // Retraso de 300ms a la petición para no saturar al tipear
     return () => clearTimeout(t);
   }, [searchTerm]);
 
@@ -190,7 +202,7 @@ useEffect(() => {
       `}</style>
 
       <nav style={{
-        position: 'absolute', top: 0, left: 0, width: '100%',
+        position: 'fixed', top: 0, left: 0, width: '100%',
         height: isMobile ? '70px' : '80px',
         display: 'flex', alignItems: 'center',
         padding: '0 6%', backgroundColor: 'black', borderBottom: '1px solid #e60000',
@@ -267,7 +279,6 @@ useEffect(() => {
               </span>
               {isOpen && (
                 <div className="catalog-dropdown">
-                  <div className="catalog-dropdown-header">Categorías</div>
                   {categorias.map((cat, i) => (
                     <Link key={i} to={generarRuta(cat.nombre)} className={`catalog-item${i === 0 ? ' todos' : ''}`}>
                       {cat.nombre}

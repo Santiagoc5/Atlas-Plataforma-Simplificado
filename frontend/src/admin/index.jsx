@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { setForceLogout } from "./api";
 import styles from "./styles";
 import { NAV, NAV_GROUPS } from "./constants";
@@ -10,6 +10,12 @@ import ProductsPanel from "./panels/ProductsPanel";
 import CategoriesPanel from "./panels/CategoriesPanel";
 import VehiclesPanel from "./panels/VehiclesPanel";
 
+/**
+ * Componente principal del Panel de Administración.
+ * Maneja la estructura de diseño (Layout), el estado responsivo de la barra lateral,
+ * y enruta los diferentes paneles (Dashboard, Productos, etc.) 
+ * basándose en el estado de 'page'. Requiere autenticación.
+ */
 const PANELS = {
   dashboard: Dashboard,
   products: ProductsPanel,
@@ -22,12 +28,12 @@ export default function AdminPanel() {
   setForceLogout(logout);
 
   const [page, setPage] = useState("dashboard");
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 1024);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 1024);
 
   useEffect(() => {
     const onResize = () => {
-      const m = window.innerWidth <= 768;
+      const m = window.innerWidth <= 1024;
       setIsMobile(m);
       setSidebarOpen(!m);
     };
@@ -61,20 +67,21 @@ export default function AdminPanel() {
           )}
 
           <nav className={`sidebar ${sidebarOpen ? "" : "collapsed"}`}>
-            <div className="sidebar-logo">
-              <div className="logo-mark">A</div>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: 15 }}>Atlas Admin</div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: "var(--text3)",
-                    fontWeight: 500,
-                  }}
+            <div className="sidebar-logo" style={{ justifyContent: "center", padding: "20px 0", position: "relative" }}>
+              <img 
+                src="/logo.png" 
+                alt="Atlas Accesorios Logo" 
+                style={{ height: "45px", width: "auto", objectFit: "contain" }} 
+              />
+              {isMobile && (
+                <button
+                  className="btn btn-ghost btn-icon"
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)" }}
+                  onClick={() => setSidebarOpen(false)}
                 >
-                  Panel de Control
-                </div>
-              </div>
+                  <X size={18} />
+                </button>
+              )}
             </div>
 
             <div className="sidebar-nav">
@@ -99,9 +106,6 @@ export default function AdminPanel() {
 
             <div className="sidebar-footer">
               <div className="user-card">
-                <div className="user-avatar">
-                  {session.user.nombre?.[0]?.toUpperCase() || "A"}
-                </div>
                 <div style={{ flex: 1, overflow: "hidden" }}>
                   <div
                     style={{
@@ -155,12 +159,6 @@ export default function AdminPanel() {
                   >
                     ADMIN
                   </div>
-                </div>
-                <div
-                  className="user-avatar"
-                  style={{ width: 32, height: 32, fontSize: 12 }}
-                >
-                  {session.user.nombre?.[0]?.toUpperCase()}
                 </div>
               </div>
             </header>

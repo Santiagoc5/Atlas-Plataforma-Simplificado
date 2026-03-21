@@ -1,6 +1,10 @@
 import React from 'react';
 import { ShieldCheck, Truck, CreditCard } from 'lucide-react';
 
+/**
+ * Componente estático que muestra los motivos de compra
+ * (Garantía, Envíos, Opciones de pago) usados en la Home.
+ */
 const Beneficios = () => {
   const data = [
     {

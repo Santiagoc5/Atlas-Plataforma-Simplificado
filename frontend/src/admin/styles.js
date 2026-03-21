@@ -1,3 +1,9 @@
+/**
+ * Estilos globales centralizados para el Panel de Administración.
+ * Define el sistema de diseño (variables CSS), la estructura principal (Layout),
+ * los estilos de componentes genéricos (tarjetas, botones, inputs, modales)
+ * y los estilos personalizados para las notificaciones (Toasts).
+ */
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,7 +21,7 @@ const styles = `
   }
   html,body,#root { background:var(--bg) !important; }
   body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; line-height:1.5; }
-  img { background:#0a0a0a; }
+  img { max-width: 100%; display: block; }
   ::-webkit-scrollbar { width:4px; height:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
   ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
@@ -148,7 +154,7 @@ const styles = `
     .filters-selects .input { width:190px; flex:none; }
   }
   @media (max-width:900px) { .two-col { grid-template-columns:1fr !important; } }
-  @media (max-width:768px) {
+  @media (max-width:1024px) {
     :root { --sidebar-w:100vw; --header-h:56px; }
     .sidebar { position:fixed; height:100vh; max-width:300px; }
     .sidebar:not(.collapsed) { box-shadow:0 0 60px rgba(0,0,0,.8); }
@@ -169,8 +175,10 @@ const styles = `
     .mc td[data-label]::before { content:attr(data-label); display:block; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); margin-bottom:2px; }
     .mc td.act { padding-top:10px; border-top:1px solid var(--border); margin-top:6px; }
   }
-  @media (max-width:400px) { .prod-grid { grid-template-columns:1fr; } }
-
+  @media (max-width:576px) { 
+    .prod-grid { grid-template-columns:1fr; } 
+    .prod-card-img { height:200px; }
+  }
   /* ── Toasts glassmorphism (solo afectan al panel admin) ── */
   @keyframes toastSlideIn  { from{opacity:0;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
   @keyframes toastSlideOut { from{opacity:1;transform:translateX(0)}    to{opacity:0;transform:translateX(18px)} }

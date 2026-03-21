@@ -1,6 +1,10 @@
 import { AlertTriangle } from "lucide-react";
 import Modal from "./Modal";
 
+/**
+ * Modal prefabricado y reutilizable para confirmación de acciones destructivas (ej. eliminar).
+ * Recibe un mensaje dinámico y callbacks para confirmar o cancelar.
+ */
 const ConfirmDialog = ({ message, onConfirm, onCancel }) => (
   <Modal
     title=""

@@ -9,6 +9,10 @@ import EmptyState from "../ui/EmptyState";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import Spinner from "../ui/Spinner";
 
+/**
+ * Panel para la gestión de categorías.
+ * Permite buscar, crear, editar en línea y eliminar categorías del catálogo.
+ */
 const CategoriesPanel = ({ token }) => {
   const { data: cats, loading, reload } = useFetch("/api/admin/categorias/", token);
 
@@ -82,7 +86,7 @@ const CategoriesPanel = ({ token }) => {
       <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, alignItems: "start" }}>
         {/* ── Crear ── */}
         <div className="card">
-          <CardHeader icon={<Plus size={16} color="var(--accent)" />} title="Nueva Categoría" />
+          <CardHeader icon={<Plus size={16} color="var(--accent)" />} title="Agregar Categoría" />
           <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
             <InputField
               label="Nombre"

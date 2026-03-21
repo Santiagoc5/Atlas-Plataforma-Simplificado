@@ -3,6 +3,10 @@ import { useCart } from '../context/CartContext';
 import { X, Trash2, Plus, Minus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Drawer (cajón lateral) interactivo para visualizar y editar el carrito.
+ * Bloquea el scroll del fondo cuando está abierto.
+ */
 const CartDrawer = ({ isOpen, onClose }) => {
   const { cart, removeFromCart, addToCart, totalPrecio, clearCart, decreaseQuantity } = useCart();
   const navigate = useNavigate();
@@ -22,27 +26,30 @@ const CartDrawer = ({ isOpen, onClose }) => {
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
       document.body.style.top = `-${scrollY}px`;
-    } else {
+    } else if (document.body.style.position === 'fixed') {
       const scrollY = parseInt(document.body.style.top || '0') * -1;
       document.body.classList.remove('drawer-open');
       document.body.classList.remove('cart-open'); // ← restaura posición
-      document.documentElement.style.overflow = 'unset';
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'unset';
-      document.body.style.width = 'unset';
-      document.body.style.top = 'unset';
-      window.scrollTo(0, scrollY);
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      window.scrollTo(0, scrollY || 0);
     }
-    return () => {
-      document.body.classList.remove('drawer-open');
-      document.body.classList.remove('cart-open');
-      document.documentElement.style.overflow = 'unset';
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'unset';
-      document.body.style.width = 'unset';
-      document.body.style.top = 'unset';
-    };
   }, [isOpen]);
+
+  // Limpiar estilos solo si el componente es desmontado completamente
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('drawer-open', 'cart-open');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -95,7 +102,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               width: '100%', backgroundColor: '#e60000', color: 'white', border: 'none',
               padding: '15px', borderRadius: '10px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer'
             }}>
-              Finalizar Compra
+              Continuar con el pedido
             </button>
           </div>
         )}

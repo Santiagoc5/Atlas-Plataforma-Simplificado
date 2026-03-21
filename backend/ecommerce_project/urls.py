@@ -1,3 +1,10 @@
+"""
+Enrutador principal (URLconf) del Proyecto Atlas.
+Centraliza y expone:
+- Endpoints públicos para el frontend de la tienda (catálogo y ofertas).
+- Endpoints protegidos para el panel administrativo (CRUD de entidades).
+- Rutas de autenticación (Login y Refresh Token con JWT).
+"""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -15,19 +22,19 @@ from products.views import (
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
-    # Administración de Django
+    # Admin nativo de Django (mantenimiento interno).
     path("admin/", admin.site.urls),
 
-    # Login del Administrador
+    # Autenticación del panel administrativo.
     path("api/login/", login_user, name="login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
-    # ── Rutas públicas (frontend) ──────────────────────────────────────────
+    # Endpoints públicos consumidos por la tienda.
     path("api/productos/", ProductoViewSet.as_view({'get': 'list'})),
     path("api/productos/ofertas/", listar_ofertas),
     path("api/predictivo/", busqueda_predictiva),
 
-    # ── Admin: Productos ───────────────────────────────────────────────────
+    # Endpoints administrativos: productos.
     path("api/admin/stats/", admin_stats),
     path("api/admin/productos/", admin_listar_productos),
     path("api/admin/productos/crear/", admin_crear_producto),
@@ -36,13 +43,13 @@ urlpatterns = [
     path("api/admin/productos/<int:pk>/vehiculos/", admin_asociar_vehiculos),
     path('api/admin/imagenes/<int:pk>/eliminar/', admin_eliminar_imagen),
 
-    # ── Admin: Categorías ──────────────────────────────────────────────────
+    # Endpoints administrativos: categorías.
     path("api/admin/categorias/", admin_listar_categorias),
     path("api/admin/categorias/crear/", admin_crear_categoria),
     path("api/admin/categorias/<int:pk>/editar/", admin_editar_categoria),
     path("api/admin/categorias/<int:pk>/eliminar/", admin_eliminar_categoria),
 
-    # ── Admin: Vehículos ───────────────────────────────────────────────────
+    # Endpoints administrativos: vehículos.
     path("api/admin/vehiculos/", admin_listar_vehiculos),
     path("api/admin/vehiculos/crear/", admin_crear_vehiculo),
     path('api/admin/vehiculos/<int:pk>/editar/', admin_editar_vehiculo),

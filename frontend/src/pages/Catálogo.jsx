@@ -5,15 +5,21 @@ import { useCart } from "../context/CartContext";
 import ModalProducto from "../components/ModalProducto";
 import { API_BASE } from "../config";
 
+/**
+ * Componente principal del Catálogo de productos.
+ * Permite buscar, filtrar y agregar productos al carrito.
+ */
 const Catalogo = () => {
+  // Estados para datos y visualización
   const [productos, setProductos] = useState([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [cargando, setCargando] = useState(true);
-  const [agregado, setAgregado] = useState({});
+  const [agregado, setAgregado] = useState({}); // Estado temporal para animar botón "Agregado"
   const location = useLocation();
-  const { hash } = location;
+  const { hash } = location; // Permite scroll a una sección específica
   const { addToCart } = useCart();
 
+  // Estados relacionados con el filtrado
   const [filtros, setFiltros] = useState({
     precioMax: 3000000,
     modelo: "",
@@ -82,19 +88,25 @@ const Catalogo = () => {
     }, 1500);
   };
 
-  // Agrupación por categoría
+  // Agrupación de productos por categoría y ordenamiento alfabético
   const agruparProductos = (lista) => {
     if (!lista || !Array.isArray(lista)) return [];
+    
     const secciones = {};
     lista.forEach((prod) => {
+      // Determina el nombre o usa 'General' por defecto
       const nombreCat =
         prod.categoria_nombre ||
         (prod.id_categoria ? `${prod.id_categoria}` : "General");
+      
+      // Crea un ID normalizado (minúsculas y guiones) para usar de ancla
       const idCat = String(nombreCat).toLowerCase().trim().replace(/\s+/g, "-");
+      
       if (!secciones[idCat])
         secciones[idCat] = { id: idCat, titulo: nombreCat, items: [] };
       secciones[idCat].items.push(prod);
     });
+    
     return Object.values(secciones).sort((a, b) =>
       a.titulo.localeCompare(b.titulo),
     );
@@ -122,18 +134,23 @@ const Catalogo = () => {
     v.nombre.toLowerCase().includes(modeloBusqueda.toLowerCase()),
   );
 
-  // Filtrado
+  // Lógica principal de Filtrado
   const productosFiltrados = productos.filter((prod) => {
+    // Determinar precio efectivo considerando posible oferta
     const precioEfectivo =
       prod.precio_oferta && Number(prod.precio_oferta) < Number(prod.precio)
         ? Number(prod.precio_oferta)
         : Number(prod.precio);
+        
     const cumplePrecio = precioEfectivo <= (filtros.precioMax || 5000000);
+    
     const cumpleModelo =
       !filtros.modelo ||
       (Array.isArray(prod.vehiculos) &&
         prod.vehiculos.some((v) => v.nombre_completo === filtros.modelo));
+        
     const cumpleCalidad = !filtros.calidad || prod.calidad === filtros.calidad;
+    
     return cumplePrecio && cumpleModelo && cumpleCalidad;
   });
 

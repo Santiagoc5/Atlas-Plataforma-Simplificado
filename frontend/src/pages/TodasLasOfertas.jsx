@@ -5,14 +5,18 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../config';
 import ModalProducto from '../components/ModalProducto';
 
+/**
+ * Página que exhibe un feed o listado completo de todos los productos en oferta.
+ */
 const TodasLasOfertas = () => {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [agregado, setAgregado] = useState({});
-  const [productoModal, setProductoModal] = useState(null);
+  const [agregado, setAgregado] = useState({}); // Controla feedback visual de botón Agregar
+  const [productoModal, setProductoModal] = useState(null); // Controla modal de producto
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
+  // Efecto que inicializa scroll top y obtiene los productos en oferta
   useEffect(() => {
     window.scrollTo(0, 0);
     const obtenerOfertas = async () => {
@@ -21,6 +25,7 @@ const TodasLasOfertas = () => {
         const data = await response.json();
         setProductos(Array.isArray(data) ? data : []);
       } catch {
+        console.error("Error cargando las ofertas");
       } finally {
         setCargando(false);
       }
@@ -28,6 +33,10 @@ const TodasLasOfertas = () => {
     obtenerOfertas();
   }, []);
 
+  /**
+   * Envuelve addToCart con animación de feedback ('¡Agregado!')
+   * y restablece el estado después de 1.5s
+   */
   const handleAddToCart = (producto) => {
     addToCart(producto);
     setAgregado((prev) => ({ ...prev, [producto.id_producto]: true }));

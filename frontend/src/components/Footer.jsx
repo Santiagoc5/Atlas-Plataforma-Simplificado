@@ -1,6 +1,10 @@
 import React from 'react';
 import { Facebook, Instagram, MessageCircle, Mail, MapPin, Phone, Medal, Truck, ShieldCheck } from 'lucide-react';
 
+/**
+ * Componente pie de página de la aplicación.
+ * Contiene enlaces a redes sociales, compromisos y datos de contacto.
+ */
 const Footer = () => {
   // Estilo común para los contenedores de iconos
   const iconContainerStyle = {

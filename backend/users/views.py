@@ -1,3 +1,9 @@
+"""
+Controladores (Vistas) de la aplicación de Usuarios.
+Gestiona el sistema de autenticación de administradores,
+exponiendo el endpoint de login que emite e inyecta los tokens JWT completos.
+"""
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view, permission_classes
@@ -6,7 +12,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.utils import timezone
-from rest_framework.permissions import IsAuthenticated
 
 Usuario = get_user_model()
 
@@ -14,20 +19,20 @@ Usuario = get_user_model()
 @permission_classes([AllowAny])
 def login_user(request):
     """
-    Login exclusivo para el administrador usando nombre de usuario.
+    Login del panel admin: valida credenciales y entrega par JWT.
     """
     username = request.data.get('username')
     password = request.data.get('password')
 
-    # Autenticamos al usuario (USERNAME_FIELD = 'username')
+    # Se autentica con el campo USERNAME_FIELD definido en el modelo personalizado.
     user = authenticate(request, username=username, password=password)
 
     if user is not None:
-        # Solo permitimos login si es staff (admin)
+        # El acceso al panel queda restringido a usuarios de staff.
         if not user.is_staff:
             return Response({'error': 'No tienes permisos de administrador'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Actualizamos last_login del administrador que accede
+        # Registro de último acceso para auditoría básica.
         user.last_login = timezone.now()
         user.save(update_fields=["last_login"])
 

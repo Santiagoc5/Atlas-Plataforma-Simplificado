@@ -1,11 +1,19 @@
 import { toast } from "react-toastify";
 
+/**
+ * Utilidades y configuración centralizada para consumir la API del backend.
+ * Incluye un wrapper 'api' para inyectar automáticamente el token JWT
+ * y manejar la renovación del token (refresh token) al interceptar código 401.
+ */
+
+// Resuelve base URL del backend según host actual del navegador.
 export const BASE = () => `http://${window.location.hostname}:8000`;
 
+// Callback inyectable para forzar cierre de sesión desde cualquier request.
 export let _forceLogout = null;
 export const setForceLogout = (fn) => { _forceLogout = fn; };
 
-// Guard: evita que múltiples llamadas simultáneas disparen logout/toast varias veces
+// Evita múltiples toasts/logout cuando varias requests fallan al mismo tiempo.
 let _sessionExpired = false;
 export const resetSessionExpired = () => { _sessionExpired = false; };
 
@@ -24,6 +32,7 @@ export const refreshAccessToken = async () => {
 };
 
 export const api = async (path, options = {}, token = null) => {
+  // Wrapper único para requests autenticadas/no autenticadas.
   const doRequest = async (tkn) => {
     const headers = { ...options.headers };
     if (tkn) headers.Authorization = `Bearer ${tkn}`;
@@ -36,11 +45,11 @@ export const api = async (path, options = {}, token = null) => {
   if (res.status === 401 && token) {
     try { res = await doRequest(await refreshAccessToken()); }
     catch {
-      // Solo la primera llamada que falla muestra el toast y hace logout
+      // Solo la primera llamada notifica y dispara logout para evitar ruido.
       if (!_sessionExpired) {
         _sessionExpired = true;
         toast.error("Sesión expirada.");
-        _forceLogout?.(true);  // true = silent, no mostrar "Sesión cerrada"
+        _forceLogout?.(true);  // true => logout silencioso (sin toast de cierre).
       }
       throw new Error("expired");
     }

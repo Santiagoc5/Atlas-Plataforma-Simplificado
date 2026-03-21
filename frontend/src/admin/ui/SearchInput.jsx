@@ -1,5 +1,9 @@
 import { Search } from "lucide-react";
 
+/**
+ * Componente de entrada de texto optimizado visualmente para búsquedas.
+ * Incluye un ícono decorativo posicionado dentro del campo.
+ */
 const SearchInput = ({ value, onChange, placeholder }) => (
   <div className="search-wrap">
     <div className="search-icon"><Search size={15} /></div>

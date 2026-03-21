@@ -2,6 +2,10 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { resetSessionExpired } from "../api";
 
+/**
+ * Hook personalizado para gestionar el estado de la sesión del administrador.
+ * Maneja el almacenamiento y recuperación de tokens (JWT) y datos de usuario en localStorage.
+ */
 const useSession = () => {
   const [session, setSession] = useState(() => {
     try {
@@ -12,7 +16,8 @@ const useSession = () => {
   });
 
   const login = (data) => {
-    resetSessionExpired();  // ← limpia el guard para la nueva sesión
+    // Reinicia guard anti-loop de expiración al iniciar una sesión válida.
+    resetSessionExpired();
     localStorage.setItem("atlas_session", JSON.stringify(data.user));
     localStorage.setItem("token", data.token);
     localStorage.setItem("refresh_token", data.refresh);

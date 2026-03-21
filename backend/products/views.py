@@ -1,3 +1,10 @@
+"""
+Controladores (Vistas) de la aplicación Productos.
+Expone endpoints públicos (búsqueda predictiva, catálogo y ofertas exclusivas) y endpoints
+protegidos (CRUD completo en el panel de administración).
+Integra parsers para 'multipart/form-data' facilitando la subida de imágenes simultáneas a la creación.
+"""
+
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,17 +16,15 @@ from .serializers import ProductoSerializer, CategoriaSerializer
 from users.models import Usuario
 
 
-# ─── VIEWSET GENERAL ──────────────────────────────────────────────────────────
-
 class ProductoViewSet(viewsets.ModelViewSet):
+    # Endpoint CRUD base expuesto para catálogo público (se usa principalmente para listar).
     queryset = Producto.objects.all().order_by('id_producto')
     serializer_class = ProductoSerializer
 
 
-# ─── BÚSQUEDA PREDICTIVA ──────────────────────────────────────────────────────
-
 @api_view(['GET'])
 def busqueda_predictiva(request):
+    # Devuelve hasta 5 coincidencias para autocompletado cuando hay al menos 2 caracteres.
     query = request.query_params.get('q', '')
     if len(query) > 1:
         productos = Producto.objects.filter(
@@ -30,10 +35,9 @@ def busqueda_predictiva(request):
     return Response([])
 
 
-# ─── OFERTAS ──────────────────────────────────────────────────────────────────
-
 @api_view(['GET'])
 def listar_ofertas(request):
+    # Solo se muestran productos realmente vendibles en oferta.
     productos = Producto.objects.filter(
         en_oferta=True,
         precio_oferta__isnull=False,
@@ -43,11 +47,10 @@ def listar_ofertas(request):
     return Response(serializer.data)
 
 
-# ─── ADMIN: ESTADÍSTICAS ──────────────────────────────────────────────────────
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_stats(request):
+    # Resumen rápido para dashboard del panel administrativo.
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     return Response({
@@ -55,11 +58,9 @@ def admin_stats(request):
         'en_oferta':        Producto.objects.filter(en_oferta=True).count(),
         'sin_stock':        Producto.objects.filter(stock=0).count(),
         'total_categorias': Categoria.objects.count(),
-        'total_usuarios':   Usuario.objects.filter(is_active=True).count(),
+        'total_vehiculos':  Vehiculo.objects.count(),
     })
 
-
-# ─── ADMIN: PRODUCTOS ─────────────────────────────────────────────────────────
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -74,6 +75,7 @@ def admin_listar_productos(request):
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def admin_crear_producto(request):
+    # Crea el producto y luego guarda cada imagen adicional enviada en multipart/form-data.
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     serializer = ProductoSerializer(data=request.data, context={'request': request})
@@ -89,6 +91,7 @@ def admin_crear_producto(request):
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def admin_actualizar_producto(request, pk):
+    # Permite actualización parcial y anexar nuevas imágenes sin borrar las existentes.
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     try:
@@ -107,6 +110,7 @@ def admin_actualizar_producto(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def admin_eliminar_producto(request, pk):
+    # Se eliminan primero relaciones intermedias para evitar registros huérfanos.
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     try:
@@ -116,8 +120,6 @@ def admin_eliminar_producto(request, pk):
         return Response(status=204)
     except Producto.DoesNotExist:
         return Response({'error': 'Producto no encontrado'}, status=404)
-
-# ─── ADMIN: CATEGORÍAS ────────────────────────────────────────────────────────
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -152,6 +154,7 @@ def admin_eliminar_categoria(request, pk):
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def admin_editar_categoria(request, pk):
+    # Valida nombre no vacío y evita duplicados antes de actualizar.
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     try:
@@ -167,11 +170,10 @@ def admin_editar_categoria(request, pk):
     except Categoria.DoesNotExist:
         return Response({'error': 'Categoría no encontrada'}, status=404)
     
-# ─── ADMIN: VEHÍCULOS ─────────────────────────────────────────────────────────
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_listar_vehiculos(request):
+    # En modo búsqueda limita resultados para autocompletar; sin query devuelve catálogo completo.
     query = request.query_params.get('q', '')
     if query:
         vehiculos = Vehiculo.objects.filter(nombre_completo__icontains=query)[:10]
@@ -197,7 +199,7 @@ def admin_crear_vehiculo(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def admin_asociar_vehiculos(request, pk):
-    """Reemplaza todos los vehículos asociados a un producto."""
+    """Reemplaza por completo las compatibilidades de un producto."""
     if not request.user.is_superuser:
         return Response({'error': 'No autorizado'}, status=403)
     try:
@@ -205,13 +207,15 @@ def admin_asociar_vehiculos(request, pk):
     except Producto.DoesNotExist:
         return Response({'error': 'Producto no encontrado'}, status=404)
 
-    ids = request.data.get('vehiculos', [])  # lista de id_vehiculo
+    # Se usa estrategia "replace all": limpia y vuelve a crear asociaciones válidas.
+    ids = request.data.get('vehiculos', [])
     ProductoVehiculo.objects.filter(id_producto=producto).delete()
     for id_v in ids:
         try:
             v = Vehiculo.objects.get(pk=id_v)
             ProductoVehiculo.objects.create(id_producto=producto, id_vehiculo=v)
         except Vehiculo.DoesNotExist:
+            # Ignora IDs inválidos para no bloquear el guardado del resto.
             pass
     return Response({'msg': 'Vehículos asociados correctamente'})
 
@@ -222,9 +226,9 @@ def admin_eliminar_vehiculo(request, pk):
         return Response({'error': 'No autorizado'}, status=403)
     try:
         vehiculo = Vehiculo.objects.get(pk=pk)
-        # Primero elimina todas las asociaciones con productos
+        # Primero elimina asociaciones en tabla puente.
         ProductoVehiculo.objects.filter(id_vehiculo=vehiculo).delete()
-        # Luego elimina el vehículo
+        # Luego elimina el vehículo en sí.
         vehiculo.delete()
         return Response(status=204)
     except Vehiculo.DoesNotExist:

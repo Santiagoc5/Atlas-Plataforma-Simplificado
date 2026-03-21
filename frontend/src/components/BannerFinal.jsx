@@ -1,6 +1,10 @@
 import React from 'react';
 import { Crown, MessageCircle } from 'lucide-react';
 
+/**
+ * Banner de llamado a la acción final (CTA) en el Home.
+ * Dirige al cliente al WhatsApp de ventas.
+ */
 const BannerFinal = () => {
   return (
     <section style={{

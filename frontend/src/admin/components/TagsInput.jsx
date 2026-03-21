@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
+/**
+ * Componente de input especializado para capturar múltiples valores (etiquetas o características).
+ * Permite agregar presionando 'Enter' o ',' (coma), y eliminar mediante un botón 'X'.
+ */
 const TagsInput = ({ value, onChange }) => {
   const [input, setInput] = useState("");
 

@@ -1,6 +1,10 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 
+/**
+ * Componente de botón flotante de WhatsApp.
+ * Redirige al usuario al chat de la tienda con un mensaje predeterminado.
+ */
 const WhatsAppButton = () => {
   const phone = "573005307606";
   const message = "Hola Atlas Accesorios! Quisiera más información.";

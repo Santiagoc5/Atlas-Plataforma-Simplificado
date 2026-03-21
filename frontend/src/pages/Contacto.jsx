@@ -1,10 +1,15 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
+/**
+ * Componente de la página de Contacto.
+ * Muestra información estática sobre la ubicación, líneas de atención y horarios de la tienda.
+ */
 const Contacto = () => {
   return (
     <div style={{ paddingTop: '120px', minHeight: '80vh', backgroundColor: '#fff' }}>
-      {/* Encabezado */}
+      
+      {/* Encabezado principal de la página */}
       <div style={{ textAlign: 'center', marginBottom: '60px', padding: '0 5%' }}>
         <h1 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#1a1a1a', marginBottom: '10px' }}>
           CONTACTO <span style={{ color: '#e60000' }}>ATLAS</span>
@@ -15,7 +20,7 @@ const Contacto = () => {
         </p>
       </div>
 
-      {/* Contenedor de Tarjetas de Información */}
+      {/* Contenedor Grid con las tarjetas de información (Ubicación, Teléfono, Horarios) */}
       <div style={{ 
         maxWidth: '1100px', 
         margin: '0 auto', 
@@ -24,8 +29,7 @@ const Contacto = () => {
         gap: '30px',
         padding: '0 5%'
       }}>
-        
-        {/* Tarjeta 1: Ubicación */}
+        {/* Tarjeta 1: Información de Ubicación Física */}
         <div style={estiloTarjeta}>
           <div style={estiloIcono}><MapPin size={30} color="white" /></div>
           <h3 style={estiloTitulo}>Nuestra Sede</h3>
@@ -33,7 +37,7 @@ const Contacto = () => {
           <p style={estiloSubtexto}>Sector Automotriz</p>
         </div>
 
-        {/* Tarjeta 2: Atención Directa */}
+        {/* Tarjeta 2: Información de Línea de Atención y WhatsApp */}
         <div style={estiloTarjeta}>
           <div style={estiloIcono}><Phone size={30} color="white" /></div>
           <h3 style={estiloTitulo}>Línea Directa</h3>
@@ -41,17 +45,16 @@ const Contacto = () => {
           <p style={estiloSubtexto}>WhatsApp disponible</p>
         </div>
 
-        {/* Tarjeta 3: Horarios */}
+        {/* Tarjeta 3: Información de Horarios de Apertura */}
         <div style={estiloTarjeta}>
           <div style={estiloIcono}><Clock size={30} color="white" /></div>
           <h3 style={estiloTitulo}>Horario</h3>
           <p style={estiloTexto}>Lun - Sáb</p>
           <p style={estiloSubtexto}>9:00 AM - 6:00 PM</p>
         </div>
-
       </div>
 
-      {/* Sección de Redes Sociales / Email */}
+      {/* Sección adicional para Contacto vía Correo Electrónico */}
       <div style={{ textAlign: 'center', marginTop: '80px', padding: '40px', backgroundColor: '#f8f8f8' }}>
         <p style={{ color: '#888', marginBottom: '20px' }}>O escríbenos a nuestro correo oficial</p>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
@@ -63,7 +66,10 @@ const Contacto = () => {
   );
 };
 
-// Estilos Reutilizables
+// ==========================================
+// Estilos Reutilizables Extraídos fuera del render
+// ==========================================
+
 const estiloTarjeta = {
   backgroundColor: '#1a1a1a',
   padding: '40px 20px',

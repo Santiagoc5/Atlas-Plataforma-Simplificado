@@ -8,6 +8,9 @@ import Spinner from "../ui/Spinner";
 import TagsInput from "./TagsInput";
 import VehicleSelector from "./VehicleSelector";
 
+/**
+ * Subcomponente para renderizar la vista previa de las imágenes subidas o existentes.
+ */
 const UploadPreview = ({ file, url, text }) => (
   <div>
     <img
@@ -26,6 +29,12 @@ const UploadPreview = ({ file, url, text }) => (
   </div>
 );
 
+/**
+ * Formulario modal principal para la creación y edición de productos.
+ * Maneja la validación extensa de datos, gestión de múltiples imágenes, 
+ * características como "tags", compatibilidad con vehículos y la preparación 
+ * de la data en modo 'multipart/form-data'.
+ */
 const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
   const isEdit = !!product;
 
@@ -74,6 +83,8 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
     if (!form.sku.trim()) e.sku = "Requerido";
     if (!form.precio || isNaN(form.precio)) e.precio = "Inválido";
     if (form.stock === "" || isNaN(form.stock)) e.stock = "Inválido";
+    if (!isEdit && !mainImg) e.imagen = "Requerida";
+    if (isEdit && !product?.imagen && !mainImg) e.imagen = "Requerida";
 
     if (form.precio_oferta !== "" && form.precio_oferta !== null) {
       const precioRegular = parseFloat(form.precio);
@@ -363,8 +374,8 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
       {/* ── Imágenes ── */}
       <div className="section-lbl">Imágenes</div>
       <div className="grid2">
-        <Field label="Imagen principal">
-          <div className="upload-zone">
+        <Field label="Imagen principal" error={errors.imagen}>
+          <div className="upload-zone" style={{ borderColor: errors.imagen ? "var(--danger)" : undefined }}>
             <input
               type="file"
               accept="image/*"

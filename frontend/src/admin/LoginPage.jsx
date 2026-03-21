@@ -4,6 +4,10 @@ import { api } from "./api";
 import { InputField } from "./ui/Field";
 import Spinner from "./ui/Spinner";
 
+/**
+ * Página de autenticación para el Panel de Administración.
+ * Recopila credenciales y las envía a la API para obtener los tokens de acceso.
+ */
 const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [pass, setPass]         = useState("");
@@ -26,11 +30,11 @@ const LoginPage = ({ onLogin }) => {
       <div className="login-glow" style={{ width: 350, height: 350, background: "#3b82f6", bottom: -100, left: -80 }} />
       <div className="login-card">
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 30, justifyContent: "center" }}>
-          <div className="logo-mark" style={{ width: 46, height: 46, fontSize: 20, borderRadius: 12 }}>A</div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 18 }}>Atlas Admin</div>
-            <div style={{ fontSize: 11, color: "var(--text3)" }}>Panel de Administración</div>
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Atlas Accesorios Logo" 
+            style={{ height: "55px", width: "auto", objectFit: "contain" }} 
+          />
         </div>
         <h1 style={{ fontSize: 24, fontWeight: 800, textAlign: "center", marginBottom: 6 }}>
           Iniciar <span style={{ color: "var(--accent)" }}>Sesión</span>

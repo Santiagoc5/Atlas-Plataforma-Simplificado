@@ -10,6 +10,10 @@ import EmptyState from "../ui/EmptyState";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import Spinner from "../ui/Spinner";
 
+/**
+ * Panel para la gestión de vehículos compatibles.
+ * Permite buscar, crear, editar y eliminar los modelos que se asocian a los productos.
+ */
 const VehiclesPanel = ({ token }) => {
   const { data: vehicles, loading, reload } = useFetch("/api/admin/vehiculos/", token);
 
@@ -63,7 +67,7 @@ const VehiclesPanel = ({ token }) => {
       <div className="two-col" style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, alignItems: "start" }}>
         {/* ── Agregar ── */}
         <div className="card">
-          <CardHeader icon={<Truck size={16} color="var(--accent)" />} title="Agregar Vehículo" />
+          <CardHeader icon={<Plus size={16} color="var(--accent)" />} title="Agregar Vehículo" />
           <div style={{ padding: "20px 24px" }}>
             <InputField
               label="Nombre completo"
