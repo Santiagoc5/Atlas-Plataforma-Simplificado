@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { Pencil, Plus, Search, Trash2, Truck, X } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Car, X } from "lucide-react";
 import { api } from "../api";
 import useFetch from "../hooks/useFetch";
 import CardHeader from "../ui/CardHeader";
@@ -115,7 +115,7 @@ const VehiclesPanel = ({ token }) => {
             {loading
               ? <div className="loading-c"><Spinner /></div>
               : !filtered.length
-                ? <EmptyState icon={<Truck size={40} />} text="Sin vehículos" />
+                ? <EmptyState icon={<Car size={40} />} text="No se encontraron vehículos" />
                 : (
                   <table>
                     <thead>

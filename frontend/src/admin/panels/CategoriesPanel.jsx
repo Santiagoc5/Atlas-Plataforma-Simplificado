@@ -116,7 +116,7 @@ const CategoriesPanel = ({ token }) => {
               : !cats?.length
                 ? <EmptyState icon={<Tag size={40} />} text="Sin categorías aún" />
                 : !filtered.length
-                  ? <EmptyState icon={<Tag size={40} />} text="Sin resultados para tu búsqueda" />
+                  ? <EmptyState icon={<Tag size={40} />} text="No se encontraron categorías" />
                 : (
                   <table>
                     <thead>
