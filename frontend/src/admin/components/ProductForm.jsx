@@ -101,16 +101,23 @@ const ProductForm = ({ token, product, categorias, onClose, onSaved }) => {
 
     const stockNum = parseInt(form.stock);
 
-    if (stockNum === 0 && form.en_oferta) {
-      e.en_oferta = "No puedes poner en oferta un producto sin stock";
-    }
-
-    if (
-      stockNum === 0 &&
+    if (form.en_oferta) {
+      if (isNaN(stockNum) || stockNum <= 0) {
+        e.stock = "Requerido para oferta";
+        toast.error("No puedes poner en oferta un producto sin stock");
+      }
+      if (!form.precio_oferta || form.precio_oferta.toString().trim() === "") {
+        e.precio_oferta = "Requerido para oferta";
+        if (!isNaN(stockNum) && stockNum > 0) {
+          toast.error("Debes ingresar el precio de oferta");
+        }
+      }
+    } else if (
       form.precio_oferta !== "" &&
       form.precio_oferta !== null
     ) {
-      e.precio_oferta = "No puedes agregar precio de oferta sin stock";
+      e.precio_oferta = "Activa el toggle '¿En oferta?'";
+      toast.error("Debes activar el toggle para guardar un precio de oferta");
     }
 
     setErrors(e);

@@ -120,7 +120,7 @@ const CategoriesPanel = ({ token }) => {
                 : (
                   <table>
                     <thead>
-                      <tr><th>Nombre</th><th style={{ textAlign: "right" }}>Acción</th></tr>
+                      <tr><th>Nombre</th><th style={{ textAlign: "right" }}>Acciones</th></tr>
                     </thead>
                     <tbody>
                       {filtered.map(c => (
@@ -142,22 +142,22 @@ const CategoriesPanel = ({ token }) => {
                             )}
                           </td>
                           <td className="act">
-                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                            <div style={{ display: "flex", gap: 8 }}>
                               {editing === c.id_categoria ? (
                                 <>
-                                  <button className="btn btn-primary btn-sm" onClick={() => handleEdit(c.id_categoria)} disabled={savingEdit}>
+                                  <button className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => handleEdit(c.id_categoria)} disabled={savingEdit}>
                                     {savingEdit ? <Spinner /> : "Guardar"}
                                   </button>
-                                  <button className="btn btn-ghost btn-sm" onClick={cancelEdit} disabled={savingEdit}>
+                                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={cancelEdit} disabled={savingEdit}>
                                     <X size={14} /> Cancelar
                                   </button>
                                 </>
                               ) : (
                                 <>
-                                  <button className="btn btn-ghost btn-sm" onClick={() => startEdit(c)}>
+                                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => startEdit(c)}>
                                     <Pencil size={14} /> Editar
                                   </button>
-                                  <button className="btn btn-danger btn-sm" onClick={() => setConfirm(c)}>
+                                  <button className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => setConfirm(c)}>
                                     <Trash2 size={14} /> Eliminar
                                   </button>
                                 </>

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { Check, Pencil, Plus, Search, Trash2, Truck } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Truck, X } from "lucide-react";
 import { api } from "../api";
 import useFetch from "../hooks/useFetch";
-import Modal from "../ui/Modal";
 import CardHeader from "../ui/CardHeader";
 import { InputField } from "../ui/Field";
 import EmptyState from "../ui/EmptyState";
@@ -22,6 +21,7 @@ const VehiclesPanel = ({ token }) => {
   const [saving, setSaving]     = useState(false);
   const [editing, setEditing]   = useState(null);
   const [editName, setEditName] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const [confirm, setConfirm]   = useState(null);
 
   const handleCreate = async () => {
@@ -36,14 +36,33 @@ const VehiclesPanel = ({ token }) => {
     finally { setSaving(false); }
   };
 
-  const handleEdit = async () => {
-    if (!editName.trim()) return;
+  const startEdit = (v) => {
+    setEditing(v.id_vehiculo);
+    setEditName(v.nombre_completo);
+  };
+
+  const cancelEdit = () => {
+    setEditing(null);
+    setEditName("");
+  };
+
+  const handleEdit = async (id) => {
+    if (!editName.trim()) return toast.error("Nombre requerido");
+    setSavingEdit(true);
     try {
-      await api(`/api/admin/vehiculos/${editing.id_vehiculo}/editar/`, { method: "PATCH", body: JSON.stringify({ nombre_completo: editName }) }, token);
+      await api(
+        `/api/admin/vehiculos/${id}/editar/`,
+        { method: "PATCH", body: JSON.stringify({ nombre_completo: editName.trim() }) },
+        token
+      );
       toast.success("Vehículo actualizado");
-      setEditing(null);
+      cancelEdit();
       reload();
-    } catch (e) { toast.error(e?.error || "Error"); }
+    } catch (e) {
+      toast.error(e?.error || "Error al editar");
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -105,17 +124,43 @@ const VehiclesPanel = ({ token }) => {
                     <tbody>
                       {filtered.map(v => (
                         <tr key={v.id_vehiculo}>
-                          <td style={{ fontWeight: 600 }}>{v.nombre_completo}</td>
+                          <td>
+                            {editing === v.id_vehiculo ? (
+                              <input
+                                className="input"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") handleEdit(v.id_vehiculo);
+                                  if (e.key === "Escape") cancelEdit();
+                                }}
+                                autoFocus
+                              />
+                            ) : (
+                              <span style={{ fontWeight: 600 }}>{v.nombre_completo}</span>
+                            )}
+                          </td>
                           <td className="act">
                             <div style={{ display: "flex", gap: 8 }}>
-                              <button className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }}
-                                onClick={() => { setEditing(v); setEditName(v.nombre_completo); }}>
-                                <Pencil size={14} /> Editar
-                              </button>
-                              <button className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: "center" }}
-                                onClick={() => setConfirm(v)}>
-                                <Trash2 size={14} /> Eliminar
-                              </button>
+                              {editing === v.id_vehiculo ? (
+                                <>
+                                  <button className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => handleEdit(v.id_vehiculo)} disabled={savingEdit}>
+                                    {savingEdit ? <Spinner /> : "Guardar"}
+                                  </button>
+                                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={cancelEdit} disabled={savingEdit}>
+                                    <X size={14} /> Cancelar
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => startEdit(v)}>
+                                    <Pencil size={14} /> Editar
+                                  </button>
+                                  <button className="btn btn-danger btn-sm" style={{ flex: 1, justifyContent: "center" }} onClick={() => setConfirm(v)}>
+                                    <Trash2 size={14} /> Eliminar
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -127,28 +172,6 @@ const VehiclesPanel = ({ token }) => {
           </div>
         </div>
       </div>
-
-      {editing && (
-        <Modal
-          title="Editar Vehículo"
-          onClose={() => setEditing(null)}
-          footer={
-            <>
-              <button className="btn btn-ghost" onClick={() => setEditing(null)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={handleEdit}>
-                <Check size={16} /> Guardar
-              </button>
-            </>
-          }
-        >
-          <InputField
-            label="Nombre completo"
-            value={editName}
-            onChange={setEditName}
-            onKeyDown={e => e.key === "Enter" && handleEdit()}
-          />
-        </Modal>
-      )}
 
       {confirm && (
         <ConfirmDialog
